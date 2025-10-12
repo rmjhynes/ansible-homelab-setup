@@ -1,6 +1,11 @@
 - name: Nix package manager install
   hosts: myhosts
   tasks:
+    - name: Check if Nix package manager is installed
+      stat:
+        path: /nix
+      register: nix_dir
+
     - name: Install Nix package manager (multi-user, non-interactive)
       become: true
       shell: |
@@ -8,7 +13,7 @@
       args:
         creates: /nix
         executable: /bin/bash
-
+      when: not nix_dir.stat.exists
 
     - name: Ensure .config/nixpkgs directory exists to store Nix packages file
       ansible.builtin.file:
