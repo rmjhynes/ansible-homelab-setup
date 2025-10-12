@@ -1,0 +1,17 @@
+- name: Nix package manager install
+  hosts: myhosts
+  tasks:
+    - name: Install Nix package manager (multi-user, non-interactive)
+      become: true
+      shell: |
+        sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
+      args:
+        creates: /nix
+        executable: /bin/bash
+
+
+    - name: Ensure .config/nixpkgs directory exists to store Nix packages file
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.config/nixpkgs"
+        state: directory
+        mode: '0755'
