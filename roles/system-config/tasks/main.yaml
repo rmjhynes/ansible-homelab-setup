@@ -11,3 +11,10 @@
 
 - name: Set system locale
   ansible.builtin.command: localectl set-locale LANG={{ locale }}
+
+- name: Create motd file
+  ansible.builtin.copy:
+    dest: /etc/motd
+    content: |
+      Successfully logged into your homelab
+    mode: "0644"
