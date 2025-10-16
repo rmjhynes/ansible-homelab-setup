@@ -1,0 +1,13 @@
+- name: Set hostname
+  become: yes
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+    use: systemd
+
+- name: Set time zone
+  become: yes
+  ansible.builtin.timezone:
+    name: "{{ timezone }}"
+
+- name: Set system locale
+  ansible.builtin.command: localectl set-locale LANG={{ locale }}
