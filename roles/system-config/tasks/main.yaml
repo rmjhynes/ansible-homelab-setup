@@ -12,7 +12,7 @@
 - name: Set system locale
   ansible.builtin.command: localectl set-locale LANG={{ locale }}
 
-- name: Create motd file
+- name: Create message of the day file
   ansible.builtin.copy:
     dest: /etc/motd
     content: |
