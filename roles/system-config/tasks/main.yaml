@@ -11,11 +11,3 @@
 
 - name: Set system locale
   ansible.builtin.command: localectl set-locale LANG={{ locale }}
-
-- name: Ensure homelab user exists
-  ansible.builtin.user:
-    name: "{{ homelab_user }}"
-    groups: wheel
-    append: true
-    shell: /bin/bash
-    state: present
