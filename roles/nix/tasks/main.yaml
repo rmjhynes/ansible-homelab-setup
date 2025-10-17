@@ -13,6 +13,7 @@
   when: not nix_dir.stat.exists
 
 - name: Ensure .config/nixpkgs directory exists to store Nix packages file
+  become: true
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config/nixpkgs"
     state: directory
