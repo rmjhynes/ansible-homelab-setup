@@ -13,8 +13,10 @@
   ansible.builtin.command: localectl set-locale LANG={{ locale }}
 
 - name: Create message of the day file
+  become: yes
   ansible.builtin.copy:
-    dest: /etc/motd
+    dest: /etc/profile.d/motd.sh
     content: |
-      Successfully logged into your homelab
-    mode: "0644"
+      #!/bin/sh
+      ~/.nix-profile/bin/figlet -f larry3d Homelab
+    mode: "0755"
