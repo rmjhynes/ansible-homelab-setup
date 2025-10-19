@@ -1,5 +1,5 @@
 # Ansible Homelab Setup
-The Ansible playbook and roles used to setup my [Homelab](https://github.com/rmjhynes/ansible-homelab-setup) machine.
+The Ansible playbook and roles used to setup my [Homelab](https://github.com/rmjhynes/homelab) machine.
 
 ## Usage
 1. Setup an `inventory.ini` file in the root of this repo targeting your homelab host
