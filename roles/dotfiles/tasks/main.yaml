@@ -1,0 +1,22 @@
+- name: Print the home directory for each host
+  ansible.builtin.debug:
+    msg: "Home dir: {{ansible_env.HOME }}"
+
+- name: Install prequisite packages needed for zsh
+  ansible.builtin.command: nix-env -iA nixpkgs.zsh nixpkgs.fzf nixpkgs.zoxide
+
+- name: Checkout dotfiles repo
+  ansible.builtin.git:
+    repo: https://rmjhynes@github.com/rmjhynes/dotfiles.git
+    version: main
+    dest: "{{ ansible_env.HOME }}/dotfiles"
+    force: yes
+
+- name: Create a symbolic link for Nix packages file
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/dotfiles/config.nix"
+    dest: "{{ ansible_env.HOME }}/.config/nixpkgs/config.nix"
+    state: link
+
+- name: Run dotfiles setup script
+  ansible.builtin.shell: cd dotfiles; bash scripts/setup.sh

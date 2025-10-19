@@ -1,0 +1,27 @@
+- name: Ensure git is installed
+  ansible.builtin.command: nix-env -iA nixpkgs.git
+
+- name: Configure global Git config
+  community.general.git_config:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    scope: global
+  loop:
+    - { name: "user.name", value: "Ryan Hynes" }
+    - { name: "user.email", value: "131348960+rmjhynes@users.noreply.github.com" }
+    - { name: "url.git@github.com:.insteadof", value: "https://github.com/" }
+    - { name: "init.defaultBranch", value: "main" }
+    - { name: "push.autosetupremote", value: "true" }
+    - { name: "core.editor", value: "nvim" }
+    - { name: "alias.st", value: "status" }
+    - { name: "alias.sw", value: "switch" }
+    - { name: "alias.d", value: "diff" }
+    - { name: "alias.c", value: "commit" }
+    - { name: "alias.rb", value: "rebase" }
+
+- name: Print git config
+  ansible.builtin.command: git config --list
+  register: git_config
+
+- debug:
+    msg: "{{ git_config.stdout_lines }}"

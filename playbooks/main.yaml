@@ -1,6 +1,7 @@
 - name: Configure homelab
   hosts: myhosts
-  become: true
   roles:
     - system-config
     - nix
+    - git
+    - dotfiles
