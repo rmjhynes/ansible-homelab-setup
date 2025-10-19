@@ -18,8 +18,5 @@
     dest: "{{ ansible_env.HOME }}/.config/nixpkgs/config.nix"
     state: link
 
-- name: Set default shell to zsh for current user
-  ansible.builtin.user:
-    name: "{{ ansible_user }}"
-    shell: "{{ ansible_env.HOME }}/.nix-profile/bin/zsh"
-  become: yes
+- name: Run dotfiles setup script
+  ansible.builtin.shell: cd dotfiles; bash scripts/setup.sh
