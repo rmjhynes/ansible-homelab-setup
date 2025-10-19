@@ -19,4 +19,4 @@
     state: link
 
 - name: Run dotfiles setup script
-  ansible.builtin.shell: cd dotfiles; bash scripts/setup.sh
+  ansible.builtin.shell: cd ~/dotfiles; bash scripts/setup.sh
