@@ -2,7 +2,7 @@
   ansible.builtin.debug:
     msg: "Home dir: {{ansible_env.HOME }}"
 
-- name: Install git prequisite packages
+- name: Install prequisite packages needed for zsh
   ansible.builtin.command: nix-env -iA nixpkgs.zsh nixpkgs.fzf nixpkgs.zoxide
 
 - name: Checkout dotfiles repo
