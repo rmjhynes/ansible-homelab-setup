@@ -5,3 +5,4 @@
     - nix
     - git
     - dotfiles
+    - k3s
