@@ -19,9 +19,10 @@
     - { name: "alias.c", value: "commit" }
     - { name: "alias.rb", value: "rebase" }
 
-- name: Print git config
+- name: Get git config
   ansible.builtin.command: git config --list
   register: git_config
 
-- debug:
+- name: Print git config
+  debug:
     msg: "{{ git_config.stdout_lines }}"
