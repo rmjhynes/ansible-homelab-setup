@@ -26,3 +26,66 @@
 - name: Print git config
   debug:
     msg: "{{ git_config.stdout_lines }}"
+
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: '0700'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Generate SSH key pair if not already present
+  community.crypto.openssh_keypair:
+    path: "{{ ssh_key_path }}"
+    type: ed25519
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+    comment: "github-{{ ansible_user }}-{{ ansible_date_time.iso8601 }}"
+  register: github_ssh_key
+
+- name: Add GitHub configuration to SSH config
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.ssh/config"
+    block: |
+      Host github.com
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/github_ed25519
+        IdentitiesOnly yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - GitHub Config"
+    create: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Get public key content
+  ansible.builtin.shell: "cat {{ ssh_key_path }}.pub"
+  register: pubkey_content
+  changed_when: false
+
+- name: Add SSH key to GitHub
+  community.general.github_key:
+    name: "{{ ansible_user }}@homelab ({{ ansible_date_time.date }})"
+    token: "{{ github_token }}"
+    pubkey: "{{ pubkey_content.stdout }}"
+  when: github_token is defined and github_token | length > 0
+
+- name: Print public key if GitHub upload was skipped
+  ansible.builtin.debug:
+    msg: |
+      GitHub token not provided. Manually add this key to GitHub: {{ pubkey_content.stdout }}
+  when: github_token is not defined or github_token | length == 0
+
+# - name: Test GitHub connection (optional)
+#   ansible.builtin.command: ssh -T git@github.com
+#   register: github_connection_test
+#   changed_when: false
+#   ignore_errors: yes
+#   when: github_ssh_key.changed
+#
+# - name: Show GitHub test result
+#   ansible.builtin.debug:
+#     msg: "GitHub connection test: {{ github_connection_test.stdout }}"
+#   when: github_ssh_key.changed
