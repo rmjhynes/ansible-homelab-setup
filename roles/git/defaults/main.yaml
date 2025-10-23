@@ -1,0 +1,2 @@
+github_token: "{{ lookup('env', 'ANSIBLE_GITHUB_TOKEN') }}" # set as env var
+ssh_key_path: "{{ ansible_env.HOME }}/.ssh/github_ed25519"

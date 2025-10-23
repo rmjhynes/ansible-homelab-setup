@@ -8,5 +8,5 @@ The Ansible playbook and roles used to setup my [Homelab](https://github.com/rmj
 ## Roles
 - `system-config` - Basic system configuration
 - `nix` - Installs the [Nix package manager](https://nixos.org/download/#nix-install-linux)
-- `git` - Configures `~/.gitconfig` file
+- `git` - Configures `~/.gitconfig` file and generates an SSH key pair to authenticate to GitHub
 - `dotfiles` - Clones my [dotfiles](https://github.com/rmjhynes/dotfiles) repo and runs the setup script

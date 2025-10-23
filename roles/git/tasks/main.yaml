@@ -26,3 +26,72 @@
 - name: Print git config
   debug:
     msg: "{{ git_config.stdout_lines }}"
+
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: '0700'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Check if SSH key already exists
+  ansible.builtin.stat:
+    path: "{{ ssh_key_path }}"
+  register: ssh_key_stat
+
+- name: Generate SSH key pair if not already present
+  community.crypto.openssh_keypair:
+    path: "{{ ssh_key_path }}"
+    type: ed25519
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+    comment: "github-{{ ansible_user }}-{{ ansible_date_time.iso8601 }}"
+  when: not ssh_key_stat.stat.exists
+
+- name: Add GitHub configuration to SSH config
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.ssh/config"
+    block: |
+      Host github.com
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/github_ed25519
+        IdentitiesOnly yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - GitHub Config"
+    create: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Retrieve public key content
+  ansible.builtin.shell: "cat {{ ssh_key_path }}.pub"
+  register: pubkey_content
+  changed_when: false
+
+- name: Add SSH key to GitHub
+  community.general.github_key:
+    name: "{{ ansible_user }}@homelab ({{ ansible_date_time.date }})"
+    token: "{{ github_token }}"
+    pubkey: "{{ pubkey_content.stdout }}"
+  when:
+    - not ssh_key_stat.stat.exists # only if the ssh key did not already exist
+    - github_token is defined
+    - github_token | length > 0
+
+- name: Print public key if GitHub token not set
+  ansible.builtin.debug:
+    msg: |
+      GitHub token not provided. Manually add this key to GitHub: {{ pubkey_content.stdout }}
+  when: github_token is not defined or github_token | length == 0
+
+- name: Test GitHub SSH connection
+  ansible.builtin.command: ssh -T git@github.com
+  register: github_connection_test_result
+  changed_when: false
+  failed_when: "'successfully authenticated' not in result.stderr"
+  ignore_errors: yes
+  when:
+    - github_token is defined
+    - github_token | length > 0
