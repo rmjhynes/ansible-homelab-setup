@@ -1,17 +1,4 @@
-- name: Check if /usr/local/bin exists
-  stat:
-    path: /usr/local/bin
-  register: local_bin_dir
-
-- name: Create /usr/local/bin if it doesn't exist
-  become: yes
-  file:
-    path: /usr/local/bin
-    state: directory
-    mode: '0755'
-  when: not local_bin_dir.stat.exists
-
-- name: Install k3s
+- name: Install K3s
   become: yes
   ansible.builtin.shell: |
     curl -sfL https://get.k3s.io | sh -
@@ -30,11 +17,20 @@
     state: started
     enabled: yes
 
+- name: Get K3s version
+  command: /usr/local/bin/k3s --version
+  register: k3s_version
+  changed_when: false
+
+- name: Display K3s version
+  ansible.builtin.debug:
+    var: k3s_version.stdout_lines
+
 - name: Get cluster info
   command: /usr/local/bin/kubectl cluster-info
   register: cluster_info
   changed_when: false
 
 - name: Display cluster info
-  debug:
+  ansible.builtin.debug:
     var: cluster_info.stdout_lines
