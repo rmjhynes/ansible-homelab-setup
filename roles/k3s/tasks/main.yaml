@@ -23,5 +23,5 @@
   changed_when: false
 
 - name: Display cluster info
-  debug:
+  ansible.builtin.debug:
     var: cluster_info.stdout_lines

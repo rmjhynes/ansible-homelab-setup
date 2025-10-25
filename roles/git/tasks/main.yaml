@@ -24,7 +24,7 @@
   register: git_config
 
 - name: Print git config
-  debug:
+  ansible.builtin.debug:
     msg: "{{ git_config.stdout_lines }}"
 
 - name: Ensure .ssh directory exists
