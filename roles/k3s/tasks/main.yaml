@@ -17,6 +17,15 @@
     state: started
     enabled: yes
 
+- name: Get K3s version
+  command: /usr/local/bin/k3s --version
+  register: k3s_version
+  changed_when: false
+
+- name: Display K3s version
+  ansible.builtin.debug:
+    var: k3s_version.stdout_lines
+
 - name: Get cluster info
   command: /usr/local/bin/kubectl cluster-info
   register: cluster_info
