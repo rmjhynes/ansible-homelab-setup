@@ -20,3 +20,26 @@
 
 - name: Run dotfiles setup script
   ansible.builtin.shell: cd ~/dotfiles; bash scripts/setup.sh
+
+- name: Determine machine architecture
+  ansible.builtin.set_fact:
+    machine_arch: "{{ 'amd64' if ansible_architecture in ['x86_64'] else 'arm64' }}"
+
+- name: Print machine architecture
+  ansible.builtin.debug:
+    msg: "Machine architecture: {{ machine_arch }}"
+
+- name: Install DevPod CLI
+  become: yes
+  ansible.builtin.get_url:
+    url: "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-{{ machine_arch }}"
+    dest: /usr/local/bin/devpod
+    mode: '0755'
+
+- name: Get DevPod CLI version
+  ansible.builtin.command: /usr/local/bin/devpod version
+  register: devpod_version
+
+- name: Print DevPod CLI version
+  ansible.builtin.debug:
+    msg: "DevPod CLI version: {{ devpod_version.stdout_lines }}"
