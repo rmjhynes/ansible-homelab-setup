@@ -12,6 +12,19 @@
 - name: Set system locale
   ansible.builtin.command: localectl set-locale LANG={{ locale }}
 
+- name: Check if /usr/local/bin exists
+  stat:
+    path: /usr/local/bin
+  register: local_bin_dir
+
+- name: Create /usr/local/bin if it doesn't exist
+  become: yes
+  file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
+  when: not local_bin_dir.stat.exists
+
 - name: Create message of the day file
   become: yes
   ansible.builtin.copy:
