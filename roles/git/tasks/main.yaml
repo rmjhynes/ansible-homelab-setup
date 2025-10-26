@@ -95,3 +95,35 @@
   when:
     - github_token is defined
     - github_token | length > 0
+
+- name: Ensure ~/.gnupg exists
+  file:
+    path: "{{ gpg_dir_path }}"
+    state: directory
+    mode: '0700'
+
+- name: Find pinentry program on the target
+  command: which pinentry
+  register: pinentry_path
+  changed_when: false
+  failed_when: pinentry_path.rc != 0 and pinentry_path.stdout == ""
+
+- name: Configure GPG Agent
+  copy:
+    dest: "{{ gpg_dir_path }}/gpg-agent.conf"
+    mode: '0600'
+    content: |
+      pinentry-program {{ pinentry_path.stdout }}
+
+- name: Copy GPG batch file
+  copy:
+    src: "{{ gpg_file }}"
+    dest: "{{ gpg_file_path }}"
+    mode: '0600'
+
+- name: Check if GPG key already exists
+  command: gpg --list-secret-keys --keyid-format LONG 131348960+rmjhynes@users.noreply.github.com
+  register: gpg_check
+  ignore_errors: yes
+  changed_when: false
+
