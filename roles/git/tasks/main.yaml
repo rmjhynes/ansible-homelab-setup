@@ -103,7 +103,7 @@
     mode: '0700'
 
 - name: Find pinentry program on the target
-  command: which pinentry
+  ansible.builtin.command: which pinentry
   register: pinentry_path
   changed_when: false
   failed_when: pinentry_path.rc != 0 and pinentry_path.stdout == ""
@@ -115,6 +115,10 @@
     content: |
       pinentry-program {{ pinentry_path.stdout }}
 
+- name: Restart GPG Agent
+  ansible.builtin.command: gpgconf --kill gpg-agent
+  changed_when: false
+
 - name: Copy GPG batch file
   copy:
     src: "{{ gpg_file }}"
@@ -122,8 +126,37 @@
     mode: '0600'
 
 - name: Check if GPG key already exists
-  command: gpg --list-secret-keys --keyid-format LONG 131348960+rmjhynes@users.noreply.github.com
+  ansible.builtin.command: gpg --list-secret-keys --keyid-format=long 131348960+rmjhynes@users.noreply.github.com
   register: gpg_check
   ignore_errors: yes
   changed_when: false
 
+- name: Delete any lock files (prevents 'database_open waiting for lock' error)
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ gpg_dir_path }}/*.lock"
+    - "{{ gpg_dir_path }}/public-keys.d"
+  ignore_errors: true
+  when: gpg_check.rc != 0
+
+- name: Generate signing-only GPG key if it doesn't already exist
+  ansible.builtin.command: gpg --batch --generate-key {{ gpg_file_path }}
+  when: gpg_check.rc != 0
+
+- name: Extract GPG key ID
+  ansible.builtin.shell: "gpg --list-secret-keys --batch --with-colons --status-fd 1 | awk -F: '/^sec/ {print $5}'"
+  register: gpg_keyid
+  when: gpg_check.rc != 0
+  changed_when: false
+
+- name: Print GPG key
+  ansible.builtin.debug:
+    msg: |
+      {{ gpg_keyid.stdout }}
+  when: gpg_keyid.stdout is defined and gpg_keyid.stdout != ""
+
+- name: Export GPG key
+  ansible.builtin.command: gpg --armor --export {{ gpg_keyid.stdout }}
+  when: gpg_keyid.stdout is defined and gpg_keyid.stdout != ""
