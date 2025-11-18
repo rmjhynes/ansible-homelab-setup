@@ -1,8 +1,8 @@
-- name: Find Mullvad path
+- name: Get mullvad-daemon path
   ansible.builtin.command: which mullvad-daemon
   register: mullvad_path
 
-- name: Get Mullvad path
+- name: Print mullvad-daemon path
   ansible.builtin.debug:
     var: mullvad_path.stdout
 
@@ -11,3 +11,16 @@
   ansible.builtin.command: "{{ mullvad_path.stdout }}"
   async: 5
   poll: 0
+
+- name: Log into Mullvad
+  ansible.builtin.command: mullvad account login
+  args:
+    stdin: "{{ mullvad_account_number }}"
+
+- name: Get Mullvad Account Info
+  ansible.builtin.command: mullvad account get
+  register: mullvad_account_info
+
+- name: Print Mullvad account info
+  ansible.builtin.debug:
+    var: mullvad_account_info.stdout_lines
