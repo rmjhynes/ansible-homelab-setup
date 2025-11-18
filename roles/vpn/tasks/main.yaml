@@ -12,6 +12,7 @@
   async: 5
   poll: 0
 
+# Same as piping account number into `mullvad account login` command
 - name: Log into Mullvad
   ansible.builtin.command: mullvad account login
   args:
