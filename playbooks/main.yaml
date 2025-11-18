@@ -3,6 +3,7 @@
   roles:
     - system-config
     - nix
+    - vpn
     - git
     - dotfiles
     - k3s

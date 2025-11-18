@@ -1,0 +1,7 @@
+- name: Find Mullvad path
+  ansible.builtin.command: which mullvad-daemon
+  register: mullvad_path
+
+- name: Get Mullvad path
+  ansible.builtin.debug:
+    var: mullvad_path.stdout
