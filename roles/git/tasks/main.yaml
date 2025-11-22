@@ -96,29 +96,6 @@
     - github_pat_token is defined
     - github_pat_token | length > 0
 
-- name: list gpg keys
-  ansible.builtin.command: gpgconf --kill all
-
-# - name: Fix permissions for GPG directories and files
-#   ansible.builtin.file:
-#     path: "{{ ansible_env.HOME }}/{{ item.path }}"
-#     state: "{{ item.state }}"
-#     mode: "{{ item.mode }}"
-#     recurse: yes
-#   loop:
-#     - path: ".gnupg"
-#       mode: '0700'
-#       state: directory
-#     - path: ".gnupg/private-keys-v1.d" 
-#       mode: '0700'
-#       state: directory
-#     - path: ".gnupg/common.conf"
-#       mode: '0600'
-#       state: file
-#     - path: ".gnupg/sshcontrol"
-#       mode: '0600'
-#       state: file
-
 - name: Ensure .gnupg directory exists with proper permissions
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.gnupg"
@@ -128,20 +105,33 @@
     mode: "0700"
     recurse: yes  # ensures all internal files/directories are writable
 
-- name: Ensure required .gnupg files exist
+- name: Fix permissions for GPG directories and files
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/{{ item.path }}"
+    path: "{{ gpg_dir_path }}/{{ item.path }}"
     state: "{{ item.state }}"
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     mode: "{{ item.mode }}"
   loop:
-    - { path: ".gnupg/private-keys-v1.d", mode: '0700', state: directory }
-    - { path: ".gnupg/common.conf", mode: '0600', state: file }
-    - { path: ".gnupg/sshcontrol", mode: '0600', state: file }
+    - path: "private-keys-v1.d"
+      mode: '0700'
+      state: directory
+    - path: "sshcontrol"
+      mode: '0600'
+      state: file
 
-- name: list gpg keys
-  ansible.builtin.command: gpg --list-keys
+- name: Ensure ~/.gnupg/common.conf is empty
+  copy:
+    dest: "{{ ansible_user_dir }}/.gnupg/common.conf"
+    content: ""     # This creates/overwrites the file with empty content
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Kill keyboxd process if running
+  shell: pkill -f keyboxd
+  register: pkill_result
+  failed_when: pkill_result.rc > 1  # Only "changed" if process killed
 
 - name: Find pinentry program on the target
   ansible.builtin.command: which pinentry
