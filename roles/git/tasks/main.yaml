@@ -93,14 +93,55 @@
   failed_when: "'successfully authenticated' not in result.stderr"
   ignore_errors: yes
   when:
-    - github_token is defined
-    - github_token | length > 0
+    - github_pat_token is defined
+    - github_pat_token | length > 0
 
-- name: Ensure ~/.gnupg exists
-  file:
-    path: "{{ gpg_dir_path }}"
+- name: list gpg keys
+  ansible.builtin.command: gpgconf --kill all
+
+# - name: Fix permissions for GPG directories and files
+#   ansible.builtin.file:
+#     path: "{{ ansible_env.HOME }}/{{ item.path }}"
+#     state: "{{ item.state }}"
+#     mode: "{{ item.mode }}"
+#     recurse: yes
+#   loop:
+#     - path: ".gnupg"
+#       mode: '0700'
+#       state: directory
+#     - path: ".gnupg/private-keys-v1.d" 
+#       mode: '0700'
+#       state: directory
+#     - path: ".gnupg/common.conf"
+#       mode: '0600'
+#       state: file
+#     - path: ".gnupg/sshcontrol"
+#       mode: '0600'
+#       state: file
+
+- name: Ensure .gnupg directory exists with proper permissions
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.gnupg"
     state: directory
-    mode: '0700'
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "0700"
+    recurse: yes  # ensures all internal files/directories are writable
+
+- name: Ensure required .gnupg files exist
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/{{ item.path }}"
+    state: "{{ item.state }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: ".gnupg/private-keys-v1.d", mode: '0700', state: directory }
+    - { path: ".gnupg/common.conf", mode: '0600', state: file }
+    - { path: ".gnupg/sshcontrol", mode: '0600', state: file }
+
+- name: list gpg keys
+  ansible.builtin.command: gpg --list-keys
 
 - name: Find pinentry program on the target
   ansible.builtin.command: which pinentry
