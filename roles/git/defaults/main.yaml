@@ -1,2 +1,6 @@
-github_token: "{{ lookup('env', 'ANSIBLE_GITHUB_TOKEN') }}" # set as env var
+# A PAT token with admin:public_key access set as an env var
+github_pat_token: "{{ lookup('env', 'ANSIBLE_GITHUB_PAT_TOKEN') }}"
+gpg_file: gpg_batch.conf
+gpg_dir_path: "{{ ansible_env.HOME }}/.gnupg"
+gpg_file_path: "{{ ansible_env.HOME }}/.gnupg/{{ gpg_file }}"
 ssh_key_path: "{{ ansible_env.HOME }}/.ssh/github_ed25519"

@@ -73,18 +73,18 @@
 - name: Add SSH key to GitHub
   community.general.github_key:
     name: "{{ ansible_user }}@homelab ({{ ansible_date_time.date }})"
-    token: "{{ github_token }}"
+    token: "{{ github_pat_token }}"
     pubkey: "{{ pubkey_content.stdout }}"
   when:
     - not ssh_key_stat.stat.exists # only if the ssh key did not already exist
-    - github_token is defined
-    - github_token | length > 0
+    - github_pat_token is defined
+    - github_pat_token | length > 0
 
 - name: Print public key if GitHub token not set
   ansible.builtin.debug:
     msg: |
       GitHub token not provided. Manually add this key to GitHub: {{ pubkey_content.stdout }}
-  when: github_token is not defined or github_token | length == 0
+  when: github_pat_token is not defined or github_pat_token | length == 0
 
 - name: Test GitHub SSH connection
   ansible.builtin.command: ssh -T git@github.com
@@ -93,5 +93,101 @@
   failed_when: "'successfully authenticated' not in result.stderr"
   ignore_errors: yes
   when:
-    - github_token is defined
-    - github_token | length > 0
+    - github_pat_token is defined
+    - github_pat_token | length > 0
+
+- name: Ensure .gnupg directory exists with proper permissions
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.gnupg"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "0700"
+    recurse: yes # ensures all internal files/directories are writable
+
+- name: Fix permissions for GPG directories and files
+  ansible.builtin.file:
+    path: "{{ gpg_dir_path }}/{{ item.path }}"
+    state: "{{ item.state }}"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - path: "private-keys-v1.d"
+      mode: '0700'
+      state: directory
+    - path: "sshcontrol"
+      mode: '0600'
+      state: file
+
+- name: Ensure ~/.gnupg/common.conf is empty
+  copy:
+    dest: "{{ ansible_user_dir }}/.gnupg/common.conf"
+    content: "" # this creates/overwrites the file with empty content
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Kill keyboxd process if running
+  shell: pkill -f keyboxd
+  register: pkill_result
+  failed_when: pkill_result.rc > 1 # treat rc=0 (killed) and rc=1 (not running) as success; fail only on real errors
+
+- name: Find pinentry program on the target
+  ansible.builtin.command: which pinentry
+  register: pinentry_path
+  changed_when: false
+  failed_when: pinentry_path.rc != 0 and pinentry_path.stdout == ""
+
+- name: Configure GPG Agent
+  copy:
+    dest: "{{ gpg_dir_path }}/gpg-agent.conf"
+    mode: '0600'
+    content: |
+      pinentry-program {{ pinentry_path.stdout }}
+
+- name: Restart GPG Agent
+  ansible.builtin.command: gpgconf --kill gpg-agent
+  changed_when: false
+
+- name: Copy GPG batch file
+  copy:
+    src: "{{ gpg_file }}"
+    dest: "{{ gpg_file_path }}"
+    mode: '0600'
+
+- name: Check if GPG key already exists
+  ansible.builtin.command: gpg --list-secret-keys --keyid-format=long 131348960+rmjhynes@users.noreply.github.com
+  register: gpg_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Delete any lock files (prevents 'database_open waiting for lock' error)
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ gpg_dir_path }}/*.lock"
+    - "{{ gpg_dir_path }}/public-keys.d"
+  ignore_errors: true
+  when: gpg_check.rc != 0
+
+- name: Generate signing-only GPG key if it doesn't already exist
+  ansible.builtin.command: gpg --batch --generate-key {{ gpg_file_path }}
+  when: gpg_check.rc != 0
+
+- name: Extract GPG key ID
+  ansible.builtin.shell: "gpg --list-secret-keys --batch --with-colons --status-fd 1 | awk -F: '/^sec/ {print $5}'"
+  register: gpg_keyid
+  when: gpg_check.rc != 0
+  changed_when: false
+
+- name: Print GPG key
+  ansible.builtin.debug:
+    msg: |
+      {{ gpg_keyid.stdout }}
+  when: gpg_keyid.stdout is defined and gpg_keyid.stdout != ""
+
+- name: Export GPG key
+  ansible.builtin.command: gpg --armor --export {{ gpg_keyid.stdout }}
+  when: gpg_keyid.stdout is defined and gpg_keyid.stdout != ""
