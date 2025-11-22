@@ -103,7 +103,7 @@
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     mode: "0700"
-    recurse: yes  # ensures all internal files/directories are writable
+    recurse: yes # ensures all internal files/directories are writable
 
 - name: Fix permissions for GPG directories and files
   ansible.builtin.file:
@@ -123,7 +123,7 @@
 - name: Ensure ~/.gnupg/common.conf is empty
   copy:
     dest: "{{ ansible_user_dir }}/.gnupg/common.conf"
-    content: ""     # This creates/overwrites the file with empty content
+    content: "" # this creates/overwrites the file with empty content
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0600'
@@ -131,7 +131,7 @@
 - name: Kill keyboxd process if running
   shell: pkill -f keyboxd
   register: pkill_result
-  failed_when: pkill_result.rc > 1  # Only "changed" if process killed
+  failed_when: pkill_result.rc > 1 # treat rc=0 (killed) and rc=1 (not running) as success; fail only on real errors
 
 - name: Find pinentry program on the target
   ansible.builtin.command: which pinentry
