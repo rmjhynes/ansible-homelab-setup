@@ -73,18 +73,18 @@
 - name: Add SSH key to GitHub
   community.general.github_key:
     name: "{{ ansible_user }}@homelab ({{ ansible_date_time.date }})"
-    token: "{{ github_token }}"
+    token: "{{ github_pat_token }}"
     pubkey: "{{ pubkey_content.stdout }}"
   when:
     - not ssh_key_stat.stat.exists # only if the ssh key did not already exist
-    - github_token is defined
-    - github_token | length > 0
+    - github_pat_token is defined
+    - github_pat_token | length > 0
 
 - name: Print public key if GitHub token not set
   ansible.builtin.debug:
     msg: |
       GitHub token not provided. Manually add this key to GitHub: {{ pubkey_content.stdout }}
-  when: github_token is not defined or github_token | length == 0
+  when: github_pat_token is not defined or github_pat_token | length == 0
 
 - name: Test GitHub SSH connection
   ansible.builtin.command: ssh -T git@github.com
