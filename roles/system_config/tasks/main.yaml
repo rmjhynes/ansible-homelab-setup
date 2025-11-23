@@ -1,32 +1,39 @@
 - name: Set hostname
-  become: yes
+  become: true
   ansible.builtin.hostname:
     name: "{{ hostname }}"
     use: systemd
 
 - name: Set time zone
-  become: yes
-  ansible.builtin.timezone:
+  become: true
+  community.general.timezone:
     name: "{{ timezone }}"
 
-- name: Set system locale
+- name: Check current locale
+  ansible.builtin.command: localectl status
+  register: locale_status
+  changed_when: false
+  failed_when: locale_status.rc != 0
+
+- name: Set system locale if needed
   ansible.builtin.command: localectl set-locale LANG={{ locale }}
+  changed_when: "'{{ locale }}' not in locale_status.stdout"
 
 - name: Check if /usr/local/bin exists
-  stat:
+  ansible.builtin.stat:
     path: /usr/local/bin
   register: local_bin_dir
 
 - name: Create /usr/local/bin if it doesn't exist
-  become: yes
-  file:
+  become: true
+  ansible.builtin.file:
     path: /usr/local/bin
     state: directory
     mode: '0755'
   when: not local_bin_dir.stat.exists
 
 - name: Create message of the day file
-  become: yes
+  become: true
   ansible.builtin.copy:
     dest: /etc/profile.d/motd.sh
     content: |

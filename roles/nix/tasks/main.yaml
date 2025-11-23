@@ -1,11 +1,11 @@
 - name: Check if Nix package manager is installed
-  stat:
+  ansible.builtin.stat:
     path: /nix
   register: nix_dir
 
 - name: Install Nix package manager (multi-user, non-interactive)
   become: true
-  shell: |
+  ansible.builtin.shell: |
     sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
   args:
     creates: /nix
