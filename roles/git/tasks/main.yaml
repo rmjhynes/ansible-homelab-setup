@@ -71,7 +71,7 @@
     token: "{{ github_pat_token }}"
     pubkey: "{{ pubkey_content.stdout }}"
   when:
-    - not ssh_key_stat.stat.exists # only if the ssh key did not already exist
+    - not ssh_key_stat.stat.exists # Only if the ssh key did not already exist
     - github_pat_token is defined
     - github_pat_token | length > 0
 
@@ -98,7 +98,7 @@
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     mode: "0700"
-    recurse: true # ensures all internal files/directories are writable
+    recurse: true # Ensures all internal files/directories are writable
 
 - name: Fix permissions for GPG directories and files
   ansible.builtin.file:
@@ -118,7 +118,7 @@
 - name: Ensure ~/.gnupg/common.conf is empty
   ansible.builtin.copy:
     dest: "{{ ansible_user_dir }}/.gnupg/common.conf"
-    content: "" # this creates/overwrites the file with empty content
+    content: "" # This creates/overwrites the file with empty content
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0600'
@@ -127,7 +127,7 @@
   ansible.builtin.command: pkill -f keyboxd
   register: pkill_result
   changed_when: false
-  failed_when: pkill_result.rc > 1 # treat rc=0 (killed) and rc=1 (not running) as success; fail only on real errors
+  failed_when: pkill_result.rc > 1 # Treat rc=0 (killed) and rc=1 (not running) as success; fail only on real errors
 
 - name: Find pinentry program on the target
   ansible.builtin.command: which pinentry
@@ -155,7 +155,7 @@
 - name: Check if GPG key already exists
   ansible.builtin.command: gpg --list-secret-keys --keyid-format=long 131348960+rmjhynes@users.noreply.github.com
   register: gpg_check
-  ignore_errors: true
+  ignore_errors: true # Throws error even when key exists
   changed_when: false
 
 - name: Delete any lock files (prevents 'database_open waiting for lock' error)
@@ -166,7 +166,6 @@
     - "{{ gpg_dir_path }}/*.lock"
     - "{{ gpg_dir_path }}/public-keys.d"
   register: delete_result
-  failed_when: delete_result.rc not in [0, 2]
   when: gpg_check.rc != 0
 
 - name: Generate signing-only GPG key if it doesn't already exist
@@ -176,12 +175,14 @@
   when: gpg_check.rc != 0
 
 - name: Extract GPG key ID
-  ansible.builtin.command: "gpg --list-secret-keys --batch --with-colons --status-fd 1 | awk -F: '/^sec/ {print $5}'"
+  ansible.builtin.shell: |
+    set -o pipefail
+    gpg --list-secret-keys --batch --with-colons --status-fd 1 | awk -F: '/^sec/ {print $5}'
   register: gpg_keyid
-  when: gpg_check.rc != 0
   changed_when: false
+  when: gpg_check.rc != 0
 
-- name: Print GPG key
+- name: Print GPG key ID
   ansible.builtin.debug:
     msg: |
       {{ gpg_keyid.stdout }}
@@ -189,7 +190,20 @@
 
 - name: Export GPG key
   ansible.builtin.command: gpg --armor --export {{ gpg_keyid.stdout }}
-  register: exported_key
+  register: exported_gpg_key
   changed_when: false
-  failed_when: exported_key.rc != 0
+  failed_when: exported_gpg_key.rc != 0
   when: gpg_keyid.stdout is defined and gpg_keyid.stdout != ""
+
+- name: Print ASCII-armored GPG key
+  ansible.builtin.debug:
+    msg: "{{ exported_gpg_key.stdout | split('\n') }}"
+  when: exported_gpg_key.stdout is defined
+
+# Write GPG key to file so it can be easily copied to GitHub
+- name: Write GPG key to file
+  ansible.builtin.copy:
+    content: "{{ exported_gpg_key.stdout }}"
+    dest: /tmp/rmjhynes_homelab_github_gpg_key.asc
+    mode: '0600'
+  when: exported_gpg_key.stdout is defined
