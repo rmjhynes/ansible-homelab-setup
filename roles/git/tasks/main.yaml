@@ -175,12 +175,14 @@
   when: gpg_check.rc != 0
 
 - name: Extract GPG key ID
-  ansible.builtin.command: "gpg --list-secret-keys --batch --with-colons --status-fd 1 | awk -F: '/^sec/ {print $5}'"
+  ansible.builtin.shell: |
+    set -o pipefail
+    gpg --list-secret-keys --batch --with-colons --status-fd 1 | awk -F: '/^sec/ {print $5}'
   register: gpg_keyid
   changed_when: false
   when: gpg_check.rc != 0
 
-- name: Print GPG key
+- name: Print GPG key ID
   ansible.builtin.debug:
     msg: |
       {{ gpg_keyid.stdout }}
@@ -188,7 +190,20 @@
 
 - name: Export GPG key
   ansible.builtin.command: gpg --armor --export {{ gpg_keyid.stdout }}
-  register: exported_key
+  register: exported_gpg_key
   changed_when: false
-  failed_when: exported_key.rc != 0
+  failed_when: exported_gpg_key.rc != 0
   when: gpg_keyid.stdout is defined and gpg_keyid.stdout != ""
+
+- name: Print ASCII-armored GPG key
+  ansible.builtin.debug:
+    msg: "{{ exported_gpg_key.stdout | split('\n') }}"
+  when: exported_gpg_key.stdout is defined
+
+# Write GPG key to file so it can be easily copied to GitHub
+- name: Write GPG key to file
+  ansible.builtin.copy:
+    content: "{{ exported_gpg_key.stdout }}"
+    dest: /tmp/rmjhynes_homelab_github_gpg_key.asc
+    mode: '0600'
+  when: exported_gpg_key.stdout is defined
