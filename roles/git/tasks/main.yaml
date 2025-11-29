@@ -22,15 +22,6 @@
     - { name: "alias.c", value: "commit" }
     - { name: "alias.rb", value: "rebase" }
 
-- name: Read all global values
-  community.general.git_config_info:
-    scope: global
-  register: git_config
-
-- name: Print git config
-  ansible.builtin.debug:
-    msg: "{{ git_config.stdout_lines }}"
-
 - name: Ensure .ssh directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.ssh"
