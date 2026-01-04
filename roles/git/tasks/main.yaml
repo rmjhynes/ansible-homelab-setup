@@ -10,8 +10,8 @@
     value: "{{ item.value }}"
     scope: global
   loop:
-    - { name: "user.name", value: "Ryan Hynes" }
-    - { name: "user.email", value: "131348960+rmjhynes@users.noreply.github.com" }
+    - { name: "user.name", value: "{{ git_user_name }}" }
+    - { name: "user.email", value: "{{ git_user_email }}" }
     - { name: "url.git@github.com:.insteadof", value: "https://github.com/" }
     - { name: "init.defaultBranch", value: "main" }
     - { name: "push.autosetupremote", value: "true" }
@@ -85,7 +85,7 @@
   ansible.builtin.command: ssh -T git@github.com
   register: github_connection_test_result
   changed_when: false
-  failed_when: "'successfully authenticated' not in result.stderr"
+  failed_when: "'successfully authenticated' not in github_connection_test_result.stderr"
   ignore_errors: true
   when:
     - github_pat_token is defined
@@ -153,7 +153,7 @@
     mode: '0600'
 
 - name: Check if GPG key already exists
-  ansible.builtin.command: gpg --list-secret-keys --keyid-format=long 131348960+rmjhynes@users.noreply.github.com
+  ansible.builtin.command: gpg --list-secret-keys --keyid-format=long {{ git_user_email }}
   register: gpg_check
   ignore_errors: true # Throws error even when key exists
   changed_when: false
@@ -204,6 +204,6 @@
 - name: Write GPG key to file
   ansible.builtin.copy:
     content: "{{ exported_gpg_key.stdout }}"
-    dest: /tmp/rmjhynes_homelab_github_gpg_key.asc
+    dest: "/tmp/{{ github_username }}_homelab_github_gpg_key.asc"
     mode: '0600'
   when: exported_gpg_key.stdout is defined
