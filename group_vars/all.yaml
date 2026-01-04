@@ -10,9 +10,9 @@ timezone: Europe/London
 locale: en_GB.UTF-8
 
 # Path Configuration
-nix_bin_dir: "{{ ansible_env.HOME }}/.nix-profile/bin"
-ssh_key_path: "{{ ansible_env.HOME }}/.ssh/github_ed25519"
-gpg_dir_path: "{{ ansible_env.HOME }}/.gnupg"
+nix_bin_dir: "{{ ansible_facts['env']['HOME'] }}/.nix-profile/bin"
+ssh_key_path: "{{ ansible_facts['env']['HOME'] }}/.ssh/github_ed25519"
+gpg_dir_path: "{{ ansible_facts['env']['HOME'] }}/.gnupg"
 
 # Secrets (from environment variables)
 mullvad_account_number: "{{ lookup('env', 'ANSIBLE_MULLVAD_ACCOUNT_NUMBER') }}"
