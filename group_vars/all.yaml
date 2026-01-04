@@ -15,7 +15,7 @@ ssh_key_path: "{{ ansible_env.HOME }}/.ssh/github_ed25519"
 gpg_dir_path: "{{ ansible_env.HOME }}/.gnupg"
 
 # Secrets (from environment variables)
-mullvad_account_number: "{{ lookup('env', 'MULLVAD_ACCOUNT_NUMBER') }}"
+mullvad_account_number: "{{ lookup('env', 'ANSIBLE_MULLVAD_ACCOUNT_NUMBER') }}"
 github_pat_token: "{{ lookup('env', 'ANSIBLE_GITHUB_PAT_TOKEN') }}"
 
 # GPG Configuration
