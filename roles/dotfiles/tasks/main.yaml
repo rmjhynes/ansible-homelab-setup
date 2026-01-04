@@ -6,13 +6,13 @@
   ansible.builtin.command: nix-env -iA nixpkgs.zsh nixpkgs.fzf nixpkgs.zoxide
   args:
     creates:
-      - "{{ nix_bin_dir }}/bin/fzf"
-      - "{{ nix_bin_dir }}/bin/zoxide"
-      - "{{ nix_bin_dir }}/bin/zsh"
+      - "{{ nix_bin_dir }}/fzf"
+      - "{{ nix_bin_dir }}/zoxide"
+      - "{{ nix_bin_dir }}/zsh"
 
 - name: Checkout dotfiles repo
   ansible.builtin.git:
-    repo: https://rmjhynes@github.com/rmjhynes/dotfiles.git
+    repo: "https://{{ github_username }}@github.com/{{ github_username }}/dotfiles.git"
     version: main
     dest: "{{ ansible_env.HOME }}/dotfiles"
     force: true
