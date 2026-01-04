@@ -1,1 +1,0 @@
-mullvad_account_number: "{{ lookup('env', 'MULLVAD_ACCOUNT_NUMBER') }}"
