@@ -3,7 +3,7 @@ The Ansible playbook and roles used to setup my [Homelab](https://github.com/rmj
 
 ## Usage
 1. Setup an `inventory.ini` file in the root of this repo targeting your homelab host
-2. Run `ansible-playbook -K -i inventory.ini playbooks/main.yaml`
+2. Run `ansible-playbook -i inventory.ini playbooks/main.yaml`
 
 ## Roles
 - `system-config` - Basic system configuration
