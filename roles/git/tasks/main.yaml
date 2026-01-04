@@ -146,9 +146,9 @@
   ansible.builtin.command: gpgconf --kill gpg-agent
   changed_when: false
 
-- name: Copy GPG batch file
-  ansible.builtin.copy:
-    src: "{{ gpg_file }}"
+- name: Create GPG batch file from template
+  ansible.builtin.template:
+    src: "gpg_batch.conf.j2"
     dest: "{{ gpg_file_path }}"
     mode: '0600'
 
