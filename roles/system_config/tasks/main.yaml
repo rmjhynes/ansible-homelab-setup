@@ -17,7 +17,7 @@
 
 - name: Set system locale if needed
   ansible.builtin.command: localectl set-locale LANG={{ locale }}
-  changed_when: "'{{ locale }}' not in locale_status.stdout"
+  changed_when: "'locale' not in locale_status.stdout"
 
 - name: Check if /usr/local/bin exists
   ansible.builtin.stat:

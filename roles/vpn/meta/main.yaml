@@ -1,0 +1,4 @@
+---
+dependencies:
+  - role: nix
+# Requires Nix for mullvad package installation

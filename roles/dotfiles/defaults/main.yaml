@@ -1,1 +1,0 @@
-nix_bin_dir: "{{ ansible_env.HOME }}/.nix-profile/bin"

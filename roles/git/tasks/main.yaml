@@ -10,8 +10,8 @@
     value: "{{ item.value }}"
     scope: global
   loop:
-    - { name: "user.name", value: "Ryan Hynes" }
-    - { name: "user.email", value: "131348960+rmjhynes@users.noreply.github.com" }
+    - { name: "user.name", value: "{{ git_user_name }}" }
+    - { name: "user.email", value: "{{ git_user_email }}" }
     - { name: "url.git@github.com:.insteadof", value: "https://github.com/" }
     - { name: "init.defaultBranch", value: "main" }
     - { name: "push.autosetupremote", value: "true" }
@@ -24,11 +24,11 @@
 
 - name: Ensure .ssh directory exists
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.ssh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
     state: directory
     mode: '0700'
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
 
 - name: Check if SSH key already exists
   ansible.builtin.stat:
@@ -39,15 +39,15 @@
   community.crypto.openssh_keypair:
     path: "{{ ssh_key_path }}"
     type: ed25519
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     mode: '0600'
-    comment: "github-{{ ansible_user }}-{{ ansible_date_time.iso8601 }}"
+    comment: "github-{{ ansible_facts['user_id'] }}-{{ ansible_facts['date_time']['iso8601'] }}"
   when: not ssh_key_stat.stat.exists
 
 - name: Add GitHub configuration to SSH config
   ansible.builtin.blockinfile:
-    path: "{{ ansible_env.HOME }}/.ssh/config"
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh/config"
     block: |
       Host github.com
         HostName github.com
@@ -56,8 +56,8 @@
         IdentitiesOnly yes
     marker: "# {mark} ANSIBLE MANAGED BLOCK - GitHub Config"
     create: true
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     mode: '0600'
 
 - name: Retrieve public key content
@@ -67,7 +67,7 @@
 
 - name: Add SSH key to GitHub
   community.general.github_key:
-    name: "{{ ansible_user }}@homelab ({{ ansible_date_time.date }})"
+    name: "{{ ansible_facts['user_id'] }}@homelab ({{ ansible_facts['date_time']['date'] }})"
     token: "{{ github_pat_token }}"
     pubkey: "{{ pubkey_content.stdout }}"
   when:
@@ -85,7 +85,7 @@
   ansible.builtin.command: ssh -T git@github.com
   register: github_connection_test_result
   changed_when: false
-  failed_when: "'successfully authenticated' not in result.stderr"
+  failed_when: "'successfully authenticated' not in github_connection_test_result.stderr"
   ignore_errors: true
   when:
     - github_pat_token is defined
@@ -93,10 +93,10 @@
 
 - name: Ensure .gnupg directory exists with proper permissions
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.gnupg"
+    path: "{{ ansible_facts['env']['HOME'] }}/.gnupg"
     state: directory
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     mode: "0700"
     recurse: true # Ensures all internal files/directories are writable
 
@@ -104,8 +104,8 @@
   ansible.builtin.file:
     path: "{{ gpg_dir_path }}/{{ item.path }}"
     state: "{{ item.state }}"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     mode: "{{ item.mode }}"
   loop:
     - path: "private-keys-v1.d"
@@ -117,10 +117,10 @@
 
 - name: Ensure ~/.gnupg/common.conf is empty
   ansible.builtin.copy:
-    dest: "{{ ansible_user_dir }}/.gnupg/common.conf"
+    dest: "{{ ansible_facts['user_dir'] }}/.gnupg/common.conf"
     content: "" # This creates/overwrites the file with empty content
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     mode: '0600'
 
 - name: Kill keyboxd process if running
@@ -146,14 +146,14 @@
   ansible.builtin.command: gpgconf --kill gpg-agent
   changed_when: false
 
-- name: Copy GPG batch file
-  ansible.builtin.copy:
-    src: "{{ gpg_file }}"
+- name: Create GPG batch file from template
+  ansible.builtin.template:
+    src: "gpg_batch.conf.j2"
     dest: "{{ gpg_file_path }}"
     mode: '0600'
 
 - name: Check if GPG key already exists
-  ansible.builtin.command: gpg --list-secret-keys --keyid-format=long 131348960+rmjhynes@users.noreply.github.com
+  ansible.builtin.command: gpg --list-secret-keys --keyid-format=long {{ git_user_email }}
   register: gpg_check
   ignore_errors: true # Throws error even when key exists
   changed_when: false
@@ -204,6 +204,6 @@
 - name: Write GPG key to file
   ansible.builtin.copy:
     content: "{{ exported_gpg_key.stdout }}"
-    dest: /tmp/rmjhynes_homelab_github_gpg_key.asc
+    dest: "/tmp/{{ github_username }}_homelab_github_gpg_key.asc"
     mode: '0600'
   when: exported_gpg_key.stdout is defined

@@ -1,26 +1,26 @@
 - name: Print the home directory for each host
   ansible.builtin.debug:
-    msg: "Home dir: {{ ansible_env.HOME }}"
+    msg: "Home dir: {{ ansible_facts['env']['HOME'] }}"
 
 - name: Install prequisite packages needed for zsh
   ansible.builtin.command: nix-env -iA nixpkgs.zsh nixpkgs.fzf nixpkgs.zoxide
   args:
     creates:
-      - "{{ nix_bin_dir }}/bin/fzf"
-      - "{{ nix_bin_dir }}/bin/zoxide"
-      - "{{ nix_bin_dir }}/bin/zsh"
+      - "{{ nix_bin_dir }}/fzf"
+      - "{{ nix_bin_dir }}/zoxide"
+      - "{{ nix_bin_dir }}/zsh"
 
 - name: Checkout dotfiles repo
   ansible.builtin.git:
-    repo: https://rmjhynes@github.com/rmjhynes/dotfiles.git
+    repo: "https://{{ github_username }}@github.com/{{ github_username }}/dotfiles.git"
     version: main
-    dest: "{{ ansible_env.HOME }}/dotfiles"
+    dest: "{{ ansible_facts['env']['HOME'] }}/dotfiles"
     force: true
 
 - name: Create a symbolic link for Nix packages file
   ansible.builtin.file:
-    src: "{{ ansible_env.HOME }}/dotfiles/config.nix"
-    dest: "{{ ansible_env.HOME }}/.config/nixpkgs/config.nix"
+    src: "{{ ansible_facts['env']['HOME'] }}/dotfiles/config.nix"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/nixpkgs/config.nix"
     state: link
 
 - name: Run dotfiles setup script
@@ -30,7 +30,7 @@
 
 - name: Determine machine architecture
   ansible.builtin.set_fact:
-    machine_arch: "{{ 'amd64' if ansible_architecture in ['x86_64'] else 'arm64' }}"
+    machine_arch: "{{ 'amd64' if ansible_facts['architecture'] in ['x86_64'] else 'arm64' }}"
 
 - name: Print machine architecture
   ansible.builtin.debug:
