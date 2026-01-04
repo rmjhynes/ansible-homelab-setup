@@ -9,14 +9,14 @@
         fail_msg: |
           ERROR: ANSIBLE_MULLVAD_ACCOUNT_NUMBER environment variable is not set.
 
-          The VPN role requires this variable to authenticate with Mullvad.
+          The VPN role requires this variable to authenticate with Mullvad VPN.
           Please set it before running this playbook:
 
             export ANSIBLE_MULLVAD_ACCOUNT_NUMBER=<your_account_number>
 
           Or run the playbook with:
 
-            ANSIBLE_MULLVAD_ACCOUNT_NUMBER=your_account_number ansible-playbook -K -i inventory.ini playbooks/main.yaml
+            ANSIBLE_MULLVAD_ACCOUNT_NUMBER=<your_account_number> ansible-playbook -K -i inventory.ini playbooks/main.yaml
         success_msg: "ANSIBLE_MULLVAD_ACCOUNT_NUMBER environment variable is set - proceeding..."
   roles:
     - system_config
