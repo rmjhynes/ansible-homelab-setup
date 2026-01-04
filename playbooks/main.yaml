@@ -17,7 +17,7 @@
           Or run the playbook with:
 
             ANSIBLE_MULLVAD_ACCOUNT_NUMBER=your_account_number ansible-playbook -K -i inventory.ini playbooks/main.yaml
-        success_msg: "ANSIBLE_MULLVAD_ACCOUNT_NUMBER is configured"
+        success_msg: "ANSIBLE_MULLVAD_ACCOUNT_NUMBER environment variable is set - proceeding..."
   roles:
     - system_config
     - nix
