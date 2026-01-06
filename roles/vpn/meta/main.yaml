@@ -1,4 +1,5 @@
 ---
 dependencies:
-  - role: nix
-# Requires Nix for mullvad package installation
+  - role: dotfiles
+# Requires mullvad package to be installed
+# via dotfiles script

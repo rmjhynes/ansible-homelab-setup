@@ -21,7 +21,7 @@
   roles:
     - system_config
     - nix
-    - vpn
     - git
     - dotfiles
+    - vpn
     - k3s

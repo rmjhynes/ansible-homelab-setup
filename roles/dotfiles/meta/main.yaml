@@ -3,4 +3,4 @@ dependencies:
   - role: git
   - role: nix
 # Requires git for SSH key to clone dotfiles repo
-# Requires nix for package installations (zsh, fzf, zoxide)
+# Requires Nix to be able to install packages
