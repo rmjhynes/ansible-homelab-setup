@@ -1,5 +1,6 @@
 - name: Ensure git is installed
   ansible.builtin.command: nix-env -iA nixpkgs.git
+  environment: "{{ nix_env }}"
   args:
     creates:
       - "{{ nix_bin_dir }}/git"
@@ -9,6 +10,7 @@
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     scope: global
+  environment: "{{ nix_env }}"
   loop:
     - { name: "user.name", value: "{{ git_user_name }}" }
     - { name: "user.email", value: "{{ git_user_email }}" }

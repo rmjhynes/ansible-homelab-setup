@@ -4,6 +4,7 @@
 
 - name: Install prequisite packages needed for zsh
   ansible.builtin.command: nix-env -iA nixpkgs.zsh nixpkgs.fzf nixpkgs.zoxide
+  environment: "{{ nix_env }}"
   args:
     creates:
       - "{{ nix_bin_dir }}/fzf"
@@ -16,6 +17,7 @@
     version: main
     dest: "{{ ansible_facts['env']['HOME'] }}/dotfiles"
     force: true
+  environment: "{{ nix_env }}"
 
 - name: Create a symbolic link for Nix packages file
   ansible.builtin.file:
@@ -25,6 +27,7 @@
 
 - name: Run dotfiles setup script
   ansible.builtin.shell: cd ~/dotfiles; bash scripts/setup.sh
+  environment: "{{ nix_env }}"
   register: setup_script_output
   changed_when: "'Dotfiles installation and configuration complete' in setup_script_output.stdout"
 
