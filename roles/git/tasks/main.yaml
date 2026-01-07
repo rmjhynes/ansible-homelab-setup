@@ -113,10 +113,10 @@
     - path: "private-keys-v1.d"
       mode: '0700'
       state: directory
-    - path: "sshcontrol"
-      mode: '0600'
-      state: file
-
+    # - path: "sshcontrol"
+    #   mode: '0600'
+    #   state: file
+    #
 - name: Ensure ~/.gnupg/common.conf is empty
   ansible.builtin.copy:
     dest: "{{ ansible_facts['user_dir'] }}/.gnupg/common.conf"
