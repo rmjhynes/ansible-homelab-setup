@@ -2,15 +2,15 @@
 
 ## Prerequisites
 
-**On your control machine:**
+**On the control machine:**
 - Ansible installed
 - GitHub Personal Access Token (classic) with `admin:public_key` scope
 - Mullvad account number
 
-**Target machine:**
+**On the target machine:**
 - OpenSUSE Leap (tested on Leap 16)
 
-## Target Machine Preparation
+## Target Machine Setup
 
 ### 1. Start SSH Service
 
@@ -56,7 +56,7 @@ sudo firewall-cmd --list-services
 
 ### 3. Get Machine IP Address
 
-On the target machine, get the IP address to connect from your control machine:
+On the target machine, get the IP address in order to connect from your control machine:
 
 ```bash
 ip a
@@ -116,8 +116,6 @@ homelab | SUCCESS => {
 ```
 
 ## Running the Playbook
-
-### Run All Roles
 
 Execute the full playbook with sudo password prompt:
 
