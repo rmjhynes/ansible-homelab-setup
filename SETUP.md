@@ -139,7 +139,7 @@ sudo zypper install tar
 
 ### SELinux Compatibility
 
-OpenSUSE Leap 16 uses [SELinux](Linux/OpenSUSE%20Leap/AppArmor%20replaced%20with%20SELinux%20on%20Leap%2016.md). The Nix package manager does not work with SELinux enabled. To disable it:
+OpenSUSE Leap 16 uses SELinux. Unfortunately, Nix package manager does not work with SELinux enabled so I have disabled it. To disable it:
 
 ```bash
 sudo setenforce 0
