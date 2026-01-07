@@ -17,4 +17,6 @@
   ansible.builtin.file:
     path: "{{ ansible_facts['env']['HOME'] }}/.config/nixpkgs"
     state: directory
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     mode: '0755'
