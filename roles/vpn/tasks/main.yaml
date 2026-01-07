@@ -1,5 +1,6 @@
 - name: Get mullvad-daemon path
   ansible.builtin.command: which mullvad-daemon
+  environment: "{{ nix_env }}"
   register: mullvad_path
   changed_when: false
   failed_when: mullvad_path.rc != 0
@@ -19,6 +20,7 @@
 - name: Start mullvad-daemon
   become: true
   ansible.builtin.command: "{{ mullvad_path.stdout }}"
+  environment: "{{ nix_env }}"
   async: 5 # Run the task asynchronously on the remote host for up to 5 seconds
   poll: 0 # Do not wait for the task to finish; return immediately so Ansible can continue
   changed_when: false
@@ -27,6 +29,7 @@
 # Same as piping account number into `mullvad account login` command
 - name: Log into Mullvad
   ansible.builtin.command: mullvad account login
+  environment: "{{ nix_env }}"
   args:
     stdin: "{{ mullvad_account_number }}"
   register: mullvad_login
@@ -35,6 +38,7 @@
 
 - name: Get Mullvad Account Info
   ansible.builtin.command: mullvad account get
+  environment: "{{ nix_env }}"
   register: mullvad_account_info
   changed_when: false
   failed_when: mullvad_account_info.rc != 0
