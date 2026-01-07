@@ -62,7 +62,11 @@ On the target machine, get the IP address in order to connect from your control 
 ip a
 ```
 
-### 4. Test SSH Connection
+### 4. Setup SSH Key Authentication
+
+Ensure an SSH key is generated on your control machine and copied to the target machine for passwordless authentication.
+
+### 5. Test SSH Connection
 
 From your control machine, verify you can SSH to the target:
 
