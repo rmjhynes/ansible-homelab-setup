@@ -1,5 +1,0 @@
----
-dependencies:
-  - role: dotfiles
-# Requires mullvad package to be installed
-# via dotfiles script
