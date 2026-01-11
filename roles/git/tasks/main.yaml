@@ -3,7 +3,6 @@
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     scope: global
-  environment: "{{ nix_env }}"
   loop:
     - { name: "user.name", value: "{{ git_user_name }}" }
     - { name: "user.email", value: "{{ git_user_email }}" }

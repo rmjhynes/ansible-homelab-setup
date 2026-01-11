@@ -1,4 +1,3 @@
 ---
 dependencies:
-  - role: nix
-# Requires Nix for git package installation
+  - system_config

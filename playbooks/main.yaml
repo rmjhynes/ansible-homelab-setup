@@ -20,7 +20,6 @@
         success_msg: "ANSIBLE_MULLVAD_ACCOUNT_NUMBER environment variable is set - proceeding..."
   roles:
     - system_config
-    - nix
     - git
     - dotfiles
     - vpn

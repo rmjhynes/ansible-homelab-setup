@@ -10,7 +10,6 @@ timezone: Europe/London
 locale: en_GB.UTF-8
 
 # Path Configuration
-nix_bin_dir: "{{ ansible_facts['env']['HOME'] }}/.nix-profile/bin"
 ssh_key_path: "{{ ansible_facts['env']['HOME'] }}/.ssh/github_ed25519"
 gpg_dir_path: "{{ ansible_facts['env']['HOME'] }}/.gnupg"
 
@@ -21,10 +20,3 @@ github_pat_token: "{{ lookup('env', 'ANSIBLE_GITHUB_PAT_TOKEN') }}"
 # GPG Configuration
 gpg_file: gpg_batch.conf
 gpg_file_path: "{{ gpg_dir_path }}/{{ gpg_file }}"
-
-# Nix packages are installed to user-specific profile directories that aren't
-# in the default PATH when Ansible connects via SSH (non-interactive shell).
-# This ensures Ansible tasks can find nix-env and any packages installed via Nix.
-# The value of this was copied after checking the PATH environment variable manually on the machine.
-nix_env:
-  PATH: "{{ ansible_facts['env']['HOME'] }}/.nix-profile/bin:/nix/var/nix/profiles/default/bin:{{ ansible_facts['env']['PATH'] }}"
