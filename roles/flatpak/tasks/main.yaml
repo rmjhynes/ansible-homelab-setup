@@ -1,0 +1,17 @@
+---
+- name: Add Flathub remote repository
+  become: true
+  community.general.flatpak_remote:
+    name: flathub
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    state: present
+
+- name: Install Flatpak applications
+  become: true
+  community.general.flatpak:
+    name: "{{ item }}"
+    state: present
+    remote: flathub
+  loop:
+    - app.zen_browser.zen
+    - org.localsend.localsend_app
