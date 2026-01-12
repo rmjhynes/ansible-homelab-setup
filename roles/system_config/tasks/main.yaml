@@ -45,6 +45,11 @@
     - htop
     - zsh
 
+- name: Set rmjhynes shell to zsh
+  ansible.builtin.user:
+    name: rmjhynes
+    shell: /bin/zsh
+
 - name: Create message of the day file
   become: true
   ansible.builtin.copy:
