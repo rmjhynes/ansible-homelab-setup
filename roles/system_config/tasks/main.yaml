@@ -46,6 +46,7 @@
     - zsh
 
 - name: Set rmjhynes shell to zsh
+  become: true
   ansible.builtin.user:
     name: rmjhynes
     shell: /bin/zsh

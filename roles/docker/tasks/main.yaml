@@ -5,6 +5,7 @@
     state: present
 
 - name: Append rmjhynes user to docker group
+  become: true
   ansible.builtin.user:
     name: rmjhynes
     shell: /bin/zsh
