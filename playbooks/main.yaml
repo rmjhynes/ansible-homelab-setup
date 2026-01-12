@@ -3,6 +3,7 @@
   pre_tasks:
   roles:
     - system_config
+    - docker
     - git
     - dotfiles
     - k3s

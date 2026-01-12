@@ -1,0 +1,47 @@
+---
+- name: Ensure group docker group exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Append rmjhynes user to docker group
+  ansible.builtin.user:
+    name: rmjhynes
+    shell: /bin/zsh
+    groups: docker
+    append: yes
+
+- name: Start docker service if not started
+  ansible.builtin.service:
+    name: docker
+    state: started
+
+- name: Determine machine architecture
+  ansible.builtin.set_fact:
+    machine_arch: "{{ 'amd64' if ansible_facts['architecture'] in ['x86_64'] else 'arm64' }}"
+
+- name: Print machine architecture
+  ansible.builtin.debug:
+    msg: "Machine architecture: {{ machine_arch }}"
+
+- name: Install DevPod CLI
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-{{ machine_arch }}"
+    dest: /usr/local/bin/devpod
+    mode: '0755'
+
+- name: Get DevPod CLI version
+  ansible.builtin.command: /usr/local/bin/devpod version
+  register: devpod_version
+  changed_when: false
+
+- name: Print DevPod CLI version
+  ansible.builtin.debug:
+    msg: "DevPod CLI version: {{ devpod_version.stdout_lines }}"
+
+- name: Add docker devpod provider
+  ansible.builtin.command: devpod provider add docker
+
+- name: Use docker devpod provider
+  ansible.builtin.command: devpod provider use docker
