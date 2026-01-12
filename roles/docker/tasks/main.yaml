@@ -50,12 +50,5 @@
   ansible.builtin.command: devpod provider add docker
   when: "'docker' not in devpod_providers.stdout"
 
-- name: Check current default devpod provider
-  ansible.builtin.shell: devpod provider list | grep -E '^\*.*docker|docker.*\*'
-  register: docker_default
-  changed_when: false
-  failed_when: false
-
 - name: Use docker devpod provider
   ansible.builtin.command: devpod provider use docker
-  when: docker_default.rc != 0
