@@ -4,9 +4,11 @@
     dest: /tmp/k3s-install.sh
     mode: '0755'
 
+# The --tls-san flag adds the Docker bridge gateway IP to the k3s server certificate
+# This allows kubectl access from devcontainers which connect via the Docker bridge network
 - name: Run K3s install script
   become: true
-  ansible.builtin.command: sh /tmp/k3s-install.sh
+  ansible.builtin.command: sh /tmp/k3s-install.sh --tls-san {{ k3s_docker_bridge_gateway }}
   args:
     creates: /usr/local/bin/k3s
 

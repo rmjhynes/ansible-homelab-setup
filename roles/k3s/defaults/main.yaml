@@ -1,0 +1,3 @@
+---
+# Docker bridge gateway IP for TLS SAN (allows kubectl access from devcontainers)
+k3s_docker_bridge_gateway: "172.17.0.1"
