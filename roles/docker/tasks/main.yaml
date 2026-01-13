@@ -10,7 +10,7 @@
     name: rmjhynes
     shell: /bin/zsh
     groups: docker
-    append: yes
+    append: true
 
 - name: Start docker service if not started
   ansible.builtin.service:
@@ -49,6 +49,8 @@
 - name: Add docker devpod provider
   ansible.builtin.command: devpod provider add docker
   when: "'docker' not in devpod_providers.stdout"
+  changed_when: true
 
 - name: Use docker devpod provider
   ansible.builtin.command: devpod provider use docker
+  changed_when: false
