@@ -1,5 +1,6 @@
 ---
 - name: Ensure group docker group exists
+  become: true
   ansible.builtin.group:
     name: docker
     state: present
@@ -13,6 +14,7 @@
     append: true
 
 - name: Enable and start docker socket
+  become: true
   ansible.builtin.service:
     name: docker.socket
     state: started
