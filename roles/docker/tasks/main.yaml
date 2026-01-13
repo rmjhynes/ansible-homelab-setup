@@ -12,10 +12,11 @@
     groups: docker
     append: true
 
-- name: Start docker service if not started
+- name: Enable and start docker socket
   ansible.builtin.service:
-    name: docker
+    name: docker.socket
     state: started
+    enabled: true
 
 - name: Determine machine architecture
   ansible.builtin.set_fact:
