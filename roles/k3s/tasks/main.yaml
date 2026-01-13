@@ -10,12 +10,6 @@
   args:
     creates: /usr/local/bin/k3s
 
-- name: Chmod kube config file for sudo-less kubectl
-  become: true
-  ansible.builtin.file:
-    path: /etc/rancher/k3s/k3s.yaml
-    mode: '0644'
-
 - name: Verify K3s is running
   ansible.builtin.systemd:
     name: k3s
@@ -39,3 +33,20 @@
 - name: Display cluster info
   ansible.builtin.debug:
     var: cluster_info.stdout_lines
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.kube"
+    state: directory
+    mode: '0755'
+
+- name: Copy k3s kubeconfig to user config
+  become: true
+  ansible.builtin.shell: k3s kubectl config view --raw > "{{ ansible_env.HOME }}/.kube/config"
+  args:
+    creates: "{{ ansible_env.HOME }}/.kube/config"
+
+- name: Set kubeconfig permissions
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.kube/config"
+    mode: '0600'
