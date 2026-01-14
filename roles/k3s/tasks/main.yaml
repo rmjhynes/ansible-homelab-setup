@@ -1,54 +1,74 @@
-- name: Download K3s install script
-  ansible.builtin.get_url:
-    url: https://get.k3s.io
-    dest: /tmp/k3s-install.sh
-    mode: '0755'
+---
+- name: K3s installation and configuration
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+  block:
+    - name: Install container-selinux for K3s SELinux support
+      become: true
+      community.general.zypper:
+        name: container-selinux
+        state: present
 
-# The --tls-san flag adds the Docker bridge gateway IP to the k3s server certificate
-# This allows kubectl access from devcontainers which connect via the Docker bridge network
-- name: Run K3s install script
-  become: true
-  ansible.builtin.command: sh /tmp/k3s-install.sh --tls-san {{ k3s_docker_bridge_gateway }}
-  args:
-    creates: /usr/local/bin/k3s
+    - name: Download K3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: '0755'
 
-- name: Verify K3s is running
-  ansible.builtin.systemd:
-    name: k3s
-    state: started
-    enabled: true
+    # The --tls-san flag adds the Docker bridge gateway IP to the k3s server certificate
+    # This allows kubectl access from devcontainers which connect via the Docker bridge network
+    - name: Run K3s install script
+      become: true
+      ansible.builtin.command: sh /tmp/k3s-install.sh --tls-san {{ k3s_docker_bridge_gateway }}
+      args:
+        creates: /usr/local/bin/k3s
 
-- name: Get K3s version
-  ansible.builtin.command: /usr/local/bin/k3s --version
-  register: k3s_version
-  changed_when: false
+    - name: Verify K3s is running
+      become: true
+      ansible.builtin.systemd:
+        name: k3s
+        state: started
+        enabled: true
 
-- name: Display K3s version
-  ansible.builtin.debug:
-    var: k3s_version.stdout_lines
+    - name: Create .kube directory
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+        mode: '0755'
 
-- name: Get cluster info
-  ansible.builtin.command: /usr/local/bin/kubectl cluster-info
-  register: cluster_info
-  changed_when: false
+    - name: Copy k3s kubeconfig to user config
+      become: true
+      ansible.builtin.copy:
+        remote_src: true
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ ansible_env.HOME }}/.kube/config"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
 
-- name: Display cluster info
-  ansible.builtin.debug:
-    var: cluster_info.stdout_lines
+    - name: Set KUBECONFIG environment variable system-wide
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/profile.d/kubeconfig.sh
+        content: |
+          #!/bin/bash
+          export KUBECONFIG="{{ ansible_env.HOME }}/.kube/config"
+        mode: '0755'
 
-- name: Create .kube directory
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.kube"
-    state: directory
-    mode: '0755'
+    - name: Get K3s version
+      ansible.builtin.command: /usr/local/bin/k3s --version
+      register: k3s_version
+      changed_when: false
 
-- name: Copy k3s kubeconfig to user config
-  become: true
-  ansible.builtin.shell: k3s kubectl config view --raw > "{{ ansible_env.HOME }}/.kube/config"
-  args:
-    creates: "{{ ansible_env.HOME }}/.kube/config"
+    - name: Display K3s version
+      ansible.builtin.debug:
+        var: k3s_version.stdout_lines
 
-- name: Set kubeconfig permissions
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.kube/config"
-    mode: '0600'
+    - name: Get cluster info
+      ansible.builtin.command: /usr/local/bin/kubectl cluster-info
+      register: cluster_info
+      changed_when: false
+
+    - name: Display cluster info
+      ansible.builtin.debug:
+        var: cluster_info.stdout_lines
