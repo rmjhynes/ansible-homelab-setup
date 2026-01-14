@@ -45,15 +45,15 @@
     msg: "DevPod CLI version: {{ devpod_version.stdout_lines }}"
 
 - name: Check if docker devpod provider exists
-  ansible.builtin.command: devpod provider list
+  ansible.builtin.command: /usr/local/bin/devpod provider list
   register: devpod_providers
   changed_when: false
 
 - name: Add docker devpod provider
-  ansible.builtin.command: devpod provider add docker
+  ansible.builtin.command: /usr/local/bin/devpod provider add docker
   when: "'docker' not in devpod_providers.stdout"
   changed_when: true
 
 - name: Use docker devpod provider
-  ansible.builtin.command: devpod provider use docker
+  ansible.builtin.command: /usr/local/bin/devpod provider use docker
   changed_when: false
