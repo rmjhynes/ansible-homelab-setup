@@ -1,7 +1,7 @@
 ---
 - name: K3s installation and configuration
   environment:
-    KUBECONFIG: "{{ ansible_facts['env']['HOME'] }}/.kube/config"
+    KUBECONFIG: "{{ k3s_kubeconfig_path }}"
   block:
     - name: Install container-selinux for K3s SELinux support
       become: true
@@ -32,7 +32,7 @@
 
     - name: Create .kube directory
       ansible.builtin.file:
-        path: "{{ ansible_facts['env']['HOME'] }}/.kube"
+        path: "{{ k3s_kubeconfig_path | dirname }}"
         state: directory
         mode: '0755'
 
@@ -41,7 +41,7 @@
       ansible.builtin.copy:
         remote_src: true
         src: /etc/rancher/k3s/k3s.yaml
-        dest: "{{ ansible_facts['env']['HOME'] }}/.kube/config"
+        dest: "{{ k3s_kubeconfig_path }}"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
         mode: '0600'
@@ -52,7 +52,7 @@
         dest: /etc/profile.d/kubeconfig.sh
         content: |
           #!/bin/bash
-          export KUBECONFIG="{{ ansible_facts['env']['HOME'] }}/.kube/config"
+          export KUBECONFIG="{{ k3s_kubeconfig_path }}"
         mode: '0755'
 
     - name: Get K3s version
