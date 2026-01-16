@@ -2,6 +2,7 @@
 - name: Install Fedora dnf packages
   ansible.builtin.dnf:
     name:
+      - ansible-core
       - bat
       - fastfetch
       - figlet
