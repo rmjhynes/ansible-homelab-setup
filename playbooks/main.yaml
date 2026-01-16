@@ -3,6 +3,7 @@
   pre_tasks:
   roles:
     - system_config
+    - dnf
     - docker
     - git
     - dotfiles

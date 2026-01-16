@@ -1,0 +1,22 @@
+---
+- name: Install Fedora dnf packages
+  ansible.builtin.dnf:
+    name:
+      - bat
+      - fastfetch
+      - figlet
+      - fzf
+      - gh
+      - golangci-lint
+      - htop
+      - helm
+      - k9s
+      - neovim
+      - pre-commit
+      - rclone
+      - ripgrep
+      - vim-enhanced
+      - yq
+      - zoxide
+      - zsh
+    state: latest
