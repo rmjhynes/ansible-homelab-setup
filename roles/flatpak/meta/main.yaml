@@ -1,3 +1,3 @@
 ---
 dependencies:
-  - role: system_config
+  - role: k3s

@@ -1,4 +1,4 @@
 ---
 dependencies:
+# Requires packages used in dotfiles script
   - role: git
-# Requires git for SSH key to clone dotfiles repo

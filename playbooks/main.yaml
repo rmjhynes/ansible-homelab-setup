@@ -23,5 +23,6 @@
     - dnf
     - git
     - dotfiles
-    - vpn
     - k3s
+    - flatpak
+    - vpn
