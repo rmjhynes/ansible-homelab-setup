@@ -20,6 +20,7 @@
         success_msg: "ANSIBLE_MULLVAD_ACCOUNT_NUMBER environment variable is set - proceeding..."
   roles:
     - dnf
+    - external_packages
     - system_config
     - git
     - dotfiles
