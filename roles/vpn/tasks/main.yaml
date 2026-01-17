@@ -1,9 +1,11 @@
 ---
+# no_log prevents account number from appearing in Ansible output
 - name: Log into Mullvad
   ansible.builtin.command: mullvad account login {{ mullvad_account_number }}
   register: mullvad_login
   changed_when: mullvad_login.rc == 0
   failed_when: mullvad_login.rc != 0
+  no_log: true
 
 - name: Get Mullvad Account Info
   ansible.builtin.command: mullvad account get

@@ -60,11 +60,13 @@
   register: pubkey_content
   changed_when: false
 
+# no_log prevents PAT token from appearing in Ansible output
 - name: Add SSH key to GitHub
   community.general.github_key:
     name: "{{ ansible_facts['user_id'] }}@homelab ({{ ansible_facts['date_time']['date'] }})"
     token: "{{ github_pat_token }}"
     pubkey: "{{ pubkey_content.stdout }}"
+  no_log: true
   when:
     - not ssh_key_stat.stat.exists # Only if the ssh key did not already exist
     - github_pat_token is defined
