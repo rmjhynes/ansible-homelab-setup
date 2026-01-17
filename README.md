@@ -11,10 +11,9 @@ See [SETUP.md](SETUP.md) for detailed prerequisites, setup instructions and trou
 
 ## Roles
 - `system-config` - Basic system configuration
-- `nix` - Installs the [Nix package manager](https://nixos.org/download/#nix-install-linux)
 - `vpn` - Starts [Mullvad VPN](https://mullvad.net/en) and logs in
-- `git` - Configures `~/.gitconfig` file, generates an SSH key pair to authenticate to GitHub and a GPG key for commit signing
-- `dotfiles` - Clones my [dotfiles](https://github.com/rmjhynes/dotfiles) repo, runs the setup script and installs [DevPod CLI](https://devpod.sh/docs/getting-started/install#install-devpod-cli)
+- `git` - Configures `~/.gitconfig` file and generates an SSH key pair to authenticate to GitHub
+- `dotfiles` - Clones my [dotfiles](https://github.com/rmjhynes/dotfiles) repo and runs the setup
 - `k3s` - Installs and sets up [k3s](https://k3s.io/)
 
 ## Ansible Lint (via pre-commit)
