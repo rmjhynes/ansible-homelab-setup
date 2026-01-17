@@ -32,19 +32,6 @@
     mode: '0755'
   when: not local_bin_dir.stat.exists
 
-- name: Install packages with zypper
-  become: true
-  community.general.zypper:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - docker
-    - figlet
-    - flatpak
-    - git
-    - htop
-    - zsh
-
 - name: Set rmjhynes shell to zsh
   become: true
   ansible.builtin.user:
