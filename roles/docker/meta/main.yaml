@@ -1,4 +1,0 @@
----
-dependencies:
-  - role: system_config
-# Requires system_config for docker package installation

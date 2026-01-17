@@ -21,7 +21,6 @@
   roles:
     - system_config
     - dnf
-    - docker
     - git
     - dotfiles
     - vpn
