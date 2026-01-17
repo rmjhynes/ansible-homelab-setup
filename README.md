@@ -1,5 +1,5 @@
 # Ansible Homelab Setup
-The Ansible playbook and roles used to setup my [Homelab](https://github.com/rmjhynes/homelab) machine.
+The Ansible playbook and roles used to setup my [Homelab](https://github.com/rmjhynes/homelab) Fedora machine.
 
 ## Usage
 
@@ -10,11 +10,13 @@ See [SETUP.md](SETUP.md) for detailed prerequisites, setup instructions and trou
 2. Run `ansible-playbook -i inventory.ini playbooks/main.yaml`
 
 ## Roles
-- `system-config` - Basic system configuration
-- `vpn` - Starts [Mullvad VPN](https://mullvad.net/en) and logs in
+- `dnf` - Installs packages via the DNF package manager
+- `system_config` - Basic system configuration
 - `git` - Configures `~/.gitconfig` file and generates an SSH key pair to authenticate to GitHub
 - `dotfiles` - Clones my [dotfiles](https://github.com/rmjhynes/dotfiles) repo and runs the setup
 - `k3s` - Installs and sets up [k3s](https://k3s.io/)
+- `flatpak` - Installs Flatpak applications from Flathub
+- `vpn` - Starts [Mullvad VPN](https://mullvad.net/en) and logs in
 
 ## Ansible Lint (via pre-commit)
 [Ansible Lint](https://docs.ansible.com/projects/lint/) is run via a [pre-commit hook](https://docs.ansible.com/projects/lint/configuring/#pre-commit-setup). The configuration for this is found in the [`.ansible-lint.yaml`](.ansible-lint.yaml) file.
