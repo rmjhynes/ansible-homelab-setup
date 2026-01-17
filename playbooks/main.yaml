@@ -19,8 +19,8 @@
             ANSIBLE_MULLVAD_ACCOUNT_NUMBER=<your_account_number> ansible-playbook -K -i inventory.ini playbooks/main.yaml
         success_msg: "ANSIBLE_MULLVAD_ACCOUNT_NUMBER environment variable is set - proceeding..."
   roles:
-    - system_config
     - dnf
+    - system_config
     - git
     - dotfiles
     - k3s
