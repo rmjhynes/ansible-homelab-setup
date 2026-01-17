@@ -32,11 +32,17 @@
     mode: '0755'
   when: not local_bin_dir.stat.exists
 
+- name: Set rmjhynes shell to zsh
+  become: true
+  ansible.builtin.user:
+    name: rmjhynes
+    shell: /bin/zsh
+
 - name: Create message of the day file
   become: true
   ansible.builtin.copy:
     dest: /etc/profile.d/motd.sh
     content: |
-      #!/bin/sh
-      ~/.nix-profile/bin/figlet -f larry3d Homelab
+      #!/bin/bash
+      figlet -f larry3d Homelab
     mode: "0755"

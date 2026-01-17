@@ -1,3 +1,4 @@
+---
 - name: Download K3s install script
   ansible.builtin.get_url:
     url: https://get.k3s.io
@@ -10,20 +11,40 @@
   args:
     creates: /usr/local/bin/k3s
 
-- name: Chmod kube config file for sudo-less kubectl
-  become: true
-  ansible.builtin.file:
-    path: /etc/rancher/k3s/k3s.yaml
-    mode: '0644'
-
 - name: Verify K3s is running
+  become: true
   ansible.builtin.systemd:
     name: k3s
     state: started
     enabled: true
 
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: "{{ k3s_kubeconfig_path | dirname }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy k3s kubeconfig to user config
+  become: true
+  ansible.builtin.copy:
+    remote_src: true
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ k3s_kubeconfig_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Set KUBECONFIG environment variable system-wide
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/profile.d/kubeconfig.sh
+    content: |
+      #!/bin/bash
+      export KUBECONFIG="{{ k3s_kubeconfig_path }}"
+    mode: '0755'
+
 - name: Get K3s version
-  ansible.builtin.command: /usr/local/bin/k3s --version
+  ansible.builtin.command: k3s --version
   register: k3s_version
   changed_when: false
 
@@ -32,7 +53,9 @@
     var: k3s_version.stdout_lines
 
 - name: Get cluster info
-  ansible.builtin.command: /usr/local/bin/kubectl cluster-info
+  ansible.builtin.command: kubectl cluster-info
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig_path }}"
   register: cluster_info
   changed_when: false
 

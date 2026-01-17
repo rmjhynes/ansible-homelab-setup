@@ -1,3 +1,4 @@
 ---
-dependencies: []
-# No dependencies - this is the first role
+# Requires zsh to be installed to change shell to zsh
+dependencies:
+  - dnf

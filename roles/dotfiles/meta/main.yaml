@@ -1,6 +1,4 @@
 ---
 dependencies:
+# Requires packages used in dotfiles script
   - role: git
-  - role: nix
-# Requires git for SSH key to clone dotfiles repo
-# Requires Nix to be able to install packages

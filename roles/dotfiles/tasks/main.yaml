@@ -2,55 +2,9 @@
   ansible.builtin.debug:
     msg: "Home dir: {{ ansible_facts['env']['HOME'] }}"
 
-- name: Install prequisite packages needed for zsh
-  ansible.builtin.command: nix-env -iA nixpkgs.zsh nixpkgs.fzf nixpkgs.zoxide
-  environment: "{{ nix_env }}"
-  args:
-    creates:
-      - "{{ nix_bin_dir }}/fzf"
-      - "{{ nix_bin_dir }}/zoxide"
-      - "{{ nix_bin_dir }}/zsh"
-
 - name: Checkout dotfiles repo
   ansible.builtin.git:
     repo: "https://{{ github_username }}@github.com/{{ github_username }}/dotfiles.git"
     version: main
     dest: "{{ ansible_facts['env']['HOME'] }}/dotfiles"
     force: true
-  environment: "{{ nix_env }}"
-
-- name: Create a symbolic link for Nix packages file
-  ansible.builtin.file:
-    src: "{{ ansible_facts['env']['HOME'] }}/dotfiles/config.nix"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.config/nixpkgs/config.nix"
-    state: link
-
-- name: Run dotfiles setup script
-  ansible.builtin.shell: cd ~/dotfiles; bash scripts/setup.sh
-  environment: "{{ nix_env }}"
-  register: setup_script_output
-  changed_when: "'Dotfiles installation and configuration complete' in setup_script_output.stdout"
-
-- name: Determine machine architecture
-  ansible.builtin.set_fact:
-    machine_arch: "{{ 'amd64' if ansible_facts['architecture'] in ['x86_64'] else 'arm64' }}"
-
-- name: Print machine architecture
-  ansible.builtin.debug:
-    msg: "Machine architecture: {{ machine_arch }}"
-
-- name: Install DevPod CLI
-  become: true
-  ansible.builtin.get_url:
-    url: "https://github.com/loft-sh/devpod/releases/latest/download/devpod-linux-{{ machine_arch }}"
-    dest: /usr/local/bin/devpod
-    mode: '0755'
-
-- name: Get DevPod CLI version
-  ansible.builtin.command: /usr/local/bin/devpod version
-  register: devpod_version
-  changed_when: false
-
-- name: Print DevPod CLI version
-  ansible.builtin.debug:
-    msg: "DevPod CLI version: {{ devpod_version.stdout_lines }}"

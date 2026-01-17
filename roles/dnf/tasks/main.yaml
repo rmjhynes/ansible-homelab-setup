@@ -1,0 +1,32 @@
+---
+- name: Add Mullvad repository
+  become: true
+  ansible.builtin.get_url:
+    url: https://repository.mullvad.net/rpm/stable/mullvad.repo
+    dest: /etc/yum.repos.d/mullvad.repo
+    mode: "0644"
+
+- name: Install Fedora dnf packages
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - ansible-core
+      - bat
+      - fastfetch
+      - figlet
+      - fzf
+      - gh
+      - golangci-lint
+      - htop
+      - helm
+      - k9s
+      - mullvad-vpn
+      - neovim
+      - pre-commit
+      - rclone
+      - ripgrep
+      - vim-enhanced
+      - yq
+      - zoxide
+      - zsh
+    state: latest
