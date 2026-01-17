@@ -10,3 +10,28 @@
   ansible.builtin.command:
     cmd: /tmp/starship-install.sh -y
     creates: /usr/local/bin/starship
+
+- name: Get latest ArgoCD version
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION
+    return_content: true
+  register: argocd_version
+
+- name: Download ArgoCD CLI
+  ansible.builtin.get_url:
+    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ argocd_version.content | trim }}/argocd-linux-amd64"
+    dest: /tmp/argocd-linux-amd64
+    mode: "0555"
+
+- name: Install ArgoCD CLI
+  become: true
+  ansible.builtin.copy:
+    src: /tmp/argocd-linux-amd64
+    dest: /usr/local/bin/argocd
+    mode: "0555"
+    remote_src: true
+
+- name: Remove ArgoCD temp file
+  ansible.builtin.file:
+    path: /tmp/argocd-linux-amd64
+    state: absent
