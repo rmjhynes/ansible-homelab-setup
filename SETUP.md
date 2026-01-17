@@ -8,7 +8,7 @@
 - Mullvad account number
 
 **On the target machine:**
-- OpenSUSE Leap (tested on Leap 16)
+- Fedora
 
 ## Target Machine Setup
 
@@ -125,31 +125,4 @@ Execute the full playbook with sudo password prompt:
 
 ```bash
 ansible-playbook -i inventory.ini playbooks/main.yaml
-```
-
-## Troubleshooting
-
-### Nix Installation Requires tar
-
-If the Nix package manager installation fails because `tar` is not installed, install it using zypper (since Nix isn't available yet):
-
-```bash
-sudo zypper install tar
-```
-
-### SELinux Compatibility
-
-OpenSUSE Leap 16 uses SELinux. Unfortunately, Nix package manager does not work with SELinux enabled so I have disabled it. To disable it:
-
-```bash
-sudo setenforce 0
-sudo getenforce
-# Should output: Permissive (disabled)
-
-# Reboot to persist the change
-reboot
-
-# After reboot, verify it's still disabled
-sudo getenforce
-# Should output: Disabled
 ```
