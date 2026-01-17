@@ -8,10 +8,3 @@
     version: main
     dest: "{{ ansible_facts['env']['HOME'] }}/dotfiles"
     force: true
-
-- name: Checkout devcontainer repo
-  ansible.builtin.git:
-    repo: "https://{{ github_username }}@github.com/{{ github_username }}/dotfiles-devpod.git"
-    version: main
-    dest: "{{ ansible_facts['env']['HOME'] }}/repos/dotfiles-devpod"
-    force: true
