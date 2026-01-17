@@ -22,6 +22,7 @@
     url: "https://github.com/argoproj/argo-cd/releases/download/v{{ argocd_version.content | trim }}/argocd-linux-amd64"
     dest: /tmp/argocd-linux-amd64
     mode: "0555"
+    timeout: 180
 
 - name: Install ArgoCD CLI
   become: true
