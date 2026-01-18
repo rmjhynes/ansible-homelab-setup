@@ -11,6 +11,7 @@ See [SETUP.md](SETUP.md) for detailed prerequisites, setup instructions and trou
 
 ## Roles
 - `dnf` - Installs packages via the DNF package manager
+- `external_packages` - Installs tools not available in DNF (Starship, ArgoCD CLI, K3d, Kubeseal, Claude Code, lazygit, Ghostty)
 - `system_config` - Basic system configuration
 - `git` - Configures `~/.gitconfig` file and generates an SSH key pair to authenticate to GitHub
 - `dotfiles` - Clones my [dotfiles](https://github.com/rmjhynes/dotfiles) repo and runs the setup
