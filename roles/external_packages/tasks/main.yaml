@@ -11,6 +11,11 @@
     cmd: /tmp/starship-install.sh -y
     creates: /usr/local/bin/starship
 
+- name: Remove Starship temp file
+  ansible.builtin.file:
+    path: /tmp/starship-install.sh
+    state: absent
+
 - name: Check if ArgoCD CLI is installed
   ansible.builtin.stat:
     path: /usr/local/bin/argocd
@@ -57,6 +62,11 @@
   ansible.builtin.command:
     cmd: /tmp/k3d-install.sh
     creates: /usr/local/bin/k3d
+
+- name: Remove K3d temp file
+  ansible.builtin.file:
+    path: /tmp/k3d-install.sh
+    state: absent
 
 - name: Check if Kubeseal is installed
   ansible.builtin.stat:
