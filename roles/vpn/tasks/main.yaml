@@ -4,7 +4,9 @@
   ansible.builtin.command: mullvad account login {{ mullvad_account_number }}
   register: mullvad_login
   changed_when: mullvad_login.rc == 0
-  failed_when: mullvad_login.rc != 0
+  failed_when:
+    - mullvad_login.rc != 0
+    - "'too many devices' not in mullvad_login.stderr | lower"
   no_log: true
 
 - name: Get Mullvad Account Info
