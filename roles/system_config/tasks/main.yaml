@@ -45,4 +45,4 @@
     content: |
       #!/bin/bash
       figlet -f slant Homelab
-    mode: "0755"
+    mode: '0755'
