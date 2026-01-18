@@ -48,3 +48,32 @@
   ansible.builtin.command:
     cmd: /tmp/k3d-install.sh
     creates: /usr/local/bin/k3d
+
+- name: Download Kubeseal tarball
+  ansible.builtin.get_url:
+    url: "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{{ kubeseal_version }}/kubeseal-{{ kubeseal_version }}-linux-amd64.tar.gz"
+    dest: /tmp/kubeseal.tar.gz
+    mode: "0644"
+    timeout: 180
+
+- name: Extract Kubeseal binary
+  ansible.builtin.unarchive:
+    src: /tmp/kubeseal.tar.gz
+    dest: /tmp
+    remote_src: true
+
+- name: Install Kubeseal binary
+  become: true
+  ansible.builtin.copy:
+    src: /tmp/kubeseal
+    dest: /usr/local/bin/kubeseal
+    mode: "0755"
+    remote_src: true
+
+- name: Remove Kubeseal temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/kubeseal.tar.gz
+    - /tmp/kubeseal
