@@ -11,11 +11,17 @@
     cmd: /tmp/starship-install.sh -y
     creates: /usr/local/bin/starship
 
+- name: Check if ArgoCD CLI is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/argocd
+  register: argocd_binary
+
 - name: Get latest ArgoCD version
   ansible.builtin.uri:
     url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION
     return_content: true
   register: argocd_version
+  when: not argocd_binary.stat.exists
 
 - name: Download ArgoCD CLI
   ansible.builtin.get_url:
@@ -23,6 +29,7 @@
     dest: /tmp/argocd-linux-amd64
     mode: "0555"
     timeout: 180
+  when: not argocd_binary.stat.exists
 
 - name: Install ArgoCD CLI
   become: true
@@ -31,11 +38,13 @@
     dest: /usr/local/bin/argocd
     mode: "0555"
     remote_src: true
+  when: not argocd_binary.stat.exists
 
 - name: Remove ArgoCD temp file
   ansible.builtin.file:
     path: /tmp/argocd-linux-amd64
     state: absent
+  when: not argocd_binary.stat.exists
 
 - name: Download K3d install script
   ansible.builtin.get_url:
@@ -49,18 +58,25 @@
     cmd: /tmp/k3d-install.sh
     creates: /usr/local/bin/k3d
 
+- name: Check if Kubeseal is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/kubeseal
+  register: kubeseal_binary
+
 - name: Download Kubeseal tarball
   ansible.builtin.get_url:
     url: "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{{ kubeseal_version }}/kubeseal-{{ kubeseal_version }}-linux-amd64.tar.gz"
     dest: /tmp/kubeseal.tar.gz
     mode: "0644"
     timeout: 180
+  when: not kubeseal_binary.stat.exists
 
 - name: Extract Kubeseal binary
   ansible.builtin.unarchive:
     src: /tmp/kubeseal.tar.gz
     dest: /tmp
     remote_src: true
+  when: not kubeseal_binary.stat.exists
 
 - name: Install Kubeseal binary
   become: true
@@ -69,6 +85,7 @@
     dest: /usr/local/bin/kubeseal
     mode: "0755"
     remote_src: true
+  when: not kubeseal_binary.stat.exists
 
 - name: Remove Kubeseal temp files
   ansible.builtin.file:
@@ -77,3 +94,4 @@
   loop:
     - /tmp/kubeseal.tar.gz
     - /tmp/kubeseal
+  when: not kubeseal_binary.stat.exists
