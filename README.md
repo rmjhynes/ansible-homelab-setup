@@ -11,10 +11,12 @@ See [SETUP.md](SETUP.md) for detailed prerequisites, setup instructions and trou
 
 ## Roles
 - `dnf` - Installs packages via the DNF package manager
+- `external_packages` - Installs tools not available in DNF (Starship, ArgoCD CLI, K3d, Kubeseal, Claude Code, lazygit, Ghostty)
 - `system_config` - Basic system configuration
 - `git` - Configures `~/.gitconfig` file and generates an SSH key pair to authenticate to GitHub
 - `dotfiles` - Clones my [dotfiles](https://github.com/rmjhynes/dotfiles) repo and runs the setup
 - `k3s` - Installs and sets up [k3s](https://k3s.io/)
+- `k3d_podman` - Configures rootless podman as the container runtime for [k3d](https://k3d.io/)
 - `flatpak` - Installs Flatpak applications from Flathub
 - `vpn` - Starts [Mullvad VPN](https://mullvad.net/en) and logs in
 

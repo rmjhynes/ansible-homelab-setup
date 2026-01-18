@@ -1,0 +1,170 @@
+---
+- name: Download Starship install script
+  ansible.builtin.get_url:
+    url: https://starship.rs/install.sh
+    dest: /tmp/starship-install.sh
+    mode: "0755"
+
+- name: Install Starship prompt
+  become: true
+  ansible.builtin.command:
+    cmd: /tmp/starship-install.sh -y
+    creates: /usr/local/bin/starship
+
+- name: Remove Starship temp file
+  ansible.builtin.file:
+    path: /tmp/starship-install.sh
+    state: absent
+
+- name: Check if ArgoCD CLI is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/argocd
+  register: argocd_binary
+
+- name: Get latest ArgoCD version
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION
+    return_content: true
+  register: argocd_version
+  when: not argocd_binary.stat.exists
+
+- name: Download ArgoCD CLI
+  ansible.builtin.get_url:
+    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ argocd_version.content | trim }}/argocd-linux-amd64"
+    dest: /tmp/argocd-linux-amd64
+    mode: "0555"
+    timeout: 180
+  when: not argocd_binary.stat.exists
+
+- name: Install ArgoCD CLI
+  become: true
+  ansible.builtin.copy:
+    src: /tmp/argocd-linux-amd64
+    dest: /usr/local/bin/argocd
+    mode: "0555"
+    remote_src: true
+  when: not argocd_binary.stat.exists
+
+- name: Remove ArgoCD temp file
+  ansible.builtin.file:
+    path: /tmp/argocd-linux-amd64
+    state: absent
+  when: not argocd_binary.stat.exists
+
+- name: Download K3d install script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh
+    dest: /tmp/k3d-install.sh
+    mode: "0755"
+
+- name: Install K3d
+  become: true
+  ansible.builtin.command:
+    cmd: /tmp/k3d-install.sh
+    creates: /usr/local/bin/k3d
+
+- name: Remove K3d temp file
+  ansible.builtin.file:
+    path: /tmp/k3d-install.sh
+    state: absent
+
+- name: Check if Kubeseal is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/kubeseal
+  register: kubeseal_binary
+
+- name: Download Kubeseal tarball
+  ansible.builtin.get_url:
+    url: "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{{ kubeseal_version }}/kubeseal-{{ kubeseal_version }}-linux-amd64.tar.gz"
+    dest: /tmp/kubeseal.tar.gz
+    mode: "0644"
+    timeout: 180
+  when: not kubeseal_binary.stat.exists
+
+- name: Extract Kubeseal binary
+  ansible.builtin.unarchive:
+    src: /tmp/kubeseal.tar.gz
+    dest: /tmp
+    remote_src: true
+  when: not kubeseal_binary.stat.exists
+
+- name: Install Kubeseal binary
+  become: true
+  ansible.builtin.copy:
+    src: /tmp/kubeseal
+    dest: /usr/local/bin/kubeseal
+    mode: "0755"
+    remote_src: true
+  when: not kubeseal_binary.stat.exists
+
+- name: Remove Kubeseal temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/kubeseal.tar.gz
+    - /tmp/kubeseal
+  when: not kubeseal_binary.stat.exists
+
+- name: Check if Claude Code is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/claude"
+  register: claude_binary
+
+- name: Download Claude Code install script
+  ansible.builtin.get_url:
+    url: https://claude.ai/install.sh
+    dest: /tmp/claude-install.sh
+    mode: "0755"
+  when: not claude_binary.stat.exists
+
+- name: Install Claude Code
+  ansible.builtin.command:
+    cmd: /tmp/claude-install.sh
+  changed_when: true
+  when: not claude_binary.stat.exists
+
+- name: Remove Claude Code temp file
+  ansible.builtin.file:
+    path: /tmp/claude-install.sh
+    state: absent
+  when: not claude_binary.stat.exists
+
+- name: Check if lazygit is installed
+  ansible.builtin.stat:
+    path: /usr/bin/lazygit
+  register: lazygit_binary
+
+- name: Enable lazygit COPR repository
+  become: true
+  community.general.copr:
+    name: dejan/lazygit
+    state: enabled
+  when: not lazygit_binary.stat.exists
+
+- name: Install lazygit
+  become: true
+  ansible.builtin.dnf:
+    name: lazygit
+    state: present
+  when: not lazygit_binary.stat.exists
+
+# Ghostty installation
+- name: Check if Ghostty is installed
+  ansible.builtin.stat:
+    path: /usr/bin/ghostty
+  register: ghostty_binary
+
+- name: Enable Ghostty COPR repository
+  become: true
+  community.general.copr:
+    name: scottames/ghostty
+    state: enabled
+  when: not ghostty_binary.stat.exists
+
+- name: Install Ghostty
+  become: true
+  ansible.builtin.dnf:
+    name: ghostty
+    state: present
+  when: not ghostty_binary.stat.exists

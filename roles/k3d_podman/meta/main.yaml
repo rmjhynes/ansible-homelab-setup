@@ -1,0 +1,4 @@
+---
+# Requires k3d to be installed
+dependencies:
+  - external_packages

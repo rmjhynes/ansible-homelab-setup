@@ -44,5 +44,5 @@
     dest: /etc/profile.d/motd.sh
     content: |
       #!/bin/bash
-      figlet -f larry3d Homelab
+      figlet -f slant Homelab
     mode: "0755"
