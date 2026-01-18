@@ -129,3 +129,22 @@
     path: /tmp/claude-install.sh
     state: absent
   when: not claude_binary.stat.exists
+
+- name: Check if lazygit is installed
+  ansible.builtin.stat:
+    path: /usr/bin/lazygit
+  register: lazygit_binary
+
+- name: Enable lazygit COPR repository
+  become: true
+  community.general.copr:
+    name: dejan/lazygit
+    state: enabled
+  when: not lazygit_binary.stat.exists
+
+- name: Install lazygit
+  become: true
+  ansible.builtin.dnf:
+    name: lazygit
+    state: present
+  when: not lazygit_binary.stat.exists
