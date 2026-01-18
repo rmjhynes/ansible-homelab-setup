@@ -7,7 +7,7 @@ See [SETUP.md](SETUP.md) for detailed prerequisites, setup instructions and trou
 
 **Quick start:**
 1. Setup an `inventory.ini` file in the root of this repo targeting your homelab host
-2. Run `ansible-playbook -i inventory.ini playbooks/main.yaml`
+2. Run `ansible-playbook playbooks/main.yaml`
 
 ## Roles
 - `dnf` - Installs packages via the DNF package manager
