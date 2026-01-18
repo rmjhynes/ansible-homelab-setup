@@ -148,3 +148,23 @@
     name: lazygit
     state: present
   when: not lazygit_binary.stat.exists
+
+# Ghostty installation
+- name: Check if Ghostty is installed
+  ansible.builtin.stat:
+    path: /usr/bin/ghostty
+  register: ghostty_binary
+
+- name: Enable Ghostty COPR repository
+  become: true
+  community.general.copr:
+    name: scottames/ghostty
+    state: enabled
+  when: not ghostty_binary.stat.exists
+
+- name: Install Ghostty
+  become: true
+  ansible.builtin.dnf:
+    name: ghostty
+    state: present
+  when: not ghostty_binary.stat.exists
