@@ -10,7 +10,7 @@
   become: true
   ansible.builtin.copy:
     dest: /etc/profile.d/podman-k3d.sh
-    mode: "0644"
+    mode: '0644'
     content: |
       export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
       export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock

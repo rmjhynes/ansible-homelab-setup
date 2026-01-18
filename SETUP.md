@@ -104,7 +104,7 @@ export ANSIBLE_GITHUB_PAT_TOKEN="<github-pat-token>"
 From your control machine, verify Ansible can connect to the target:
 
 ```bash
-ansible homelab -m ping -i inventory.ini
+ansible homelab -m ping
 ```
 
 Expected output:
@@ -124,5 +124,5 @@ homelab | SUCCESS => {
 Execute the full playbook with sudo password prompt:
 
 ```bash
-ansible-playbook -i inventory.ini playbooks/main.yaml
+ansible-playbook playbooks/main.yaml
 ```

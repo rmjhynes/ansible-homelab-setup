@@ -1,3 +1,4 @@
+---
 - name: Set hostname
   become: true
   ansible.builtin.hostname:
@@ -32,10 +33,10 @@
     mode: '0755'
   when: not local_bin_dir.stat.exists
 
-- name: Set rmjhynes shell to zsh
+- name: Set user shell to zsh
   become: true
   ansible.builtin.user:
-    name: rmjhynes
+    name: "{{ ansible_facts['user_id'] }}"
     shell: /bin/zsh
 
 - name: Create message of the day file
@@ -45,4 +46,4 @@
     content: |
       #!/bin/bash
       figlet -f slant Homelab
-    mode: "0755"
+    mode: '0755'
