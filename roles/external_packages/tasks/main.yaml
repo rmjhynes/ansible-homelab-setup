@@ -3,7 +3,7 @@
   ansible.builtin.get_url:
     url: https://starship.rs/install.sh
     dest: /tmp/starship-install.sh
-    mode: "0755"
+    mode: '0755'
 
 - name: Install Starship prompt
   become: true
@@ -32,7 +32,7 @@
   ansible.builtin.get_url:
     url: "https://github.com/argoproj/argo-cd/releases/download/v{{ argocd_version.content | trim }}/argocd-linux-amd64"
     dest: /tmp/argocd-linux-amd64
-    mode: "0555"
+    mode: '0555'
     timeout: 180
   when: not argocd_binary.stat.exists
 
@@ -41,7 +41,7 @@
   ansible.builtin.copy:
     src: /tmp/argocd-linux-amd64
     dest: /usr/local/bin/argocd
-    mode: "0555"
+    mode: '0555'
     remote_src: true
   when: not argocd_binary.stat.exists
 
@@ -55,7 +55,7 @@
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh
     dest: /tmp/k3d-install.sh
-    mode: "0755"
+    mode: '0755'
 
 - name: Install K3d
   become: true
@@ -77,7 +77,7 @@
   ansible.builtin.get_url:
     url: "https://github.com/bitnami-labs/sealed-secrets/releases/download/v{{ kubeseal_version }}/kubeseal-{{ kubeseal_version }}-linux-amd64.tar.gz"
     dest: /tmp/kubeseal.tar.gz
-    mode: "0644"
+    mode: '0644'
     timeout: 180
   when: not kubeseal_binary.stat.exists
 
@@ -93,7 +93,7 @@
   ansible.builtin.copy:
     src: /tmp/kubeseal
     dest: /usr/local/bin/kubeseal
-    mode: "0755"
+    mode: '0755'
     remote_src: true
   when: not kubeseal_binary.stat.exists
 
@@ -115,7 +115,7 @@
   ansible.builtin.get_url:
     url: https://claude.ai/install.sh
     dest: /tmp/claude-install.sh
-    mode: "0755"
+    mode: '0755'
   when: not claude_binary.stat.exists
 
 - name: Install Claude Code
