@@ -36,3 +36,15 @@
   ansible.builtin.file:
     path: /tmp/argocd-linux-amd64
     state: absent
+
+- name: Download K3d install script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh
+    dest: /tmp/k3d-install.sh
+    mode: "0755"
+
+- name: Install K3d
+  become: true
+  ansible.builtin.command:
+    cmd: /tmp/k3d-install.sh
+    creates: /usr/local/bin/k3d
