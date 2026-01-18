@@ -21,6 +21,7 @@
   roles:
     - dnf
     - external_packages
+    - k3d_podman
     - system_config
     - git
     - dotfiles
