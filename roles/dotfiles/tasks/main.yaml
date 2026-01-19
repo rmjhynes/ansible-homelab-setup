@@ -1,7 +1,4 @@
-- name: Print the home directory for each host
-  ansible.builtin.debug:
-    msg: "Home dir: {{ ansible_facts['env']['HOME'] }}"
-
+---
 - name: Checkout dotfiles repo
   ansible.builtin.git:
     repo: "https://{{ github_username }}@github.com/{{ github_username }}/dotfiles.git"
