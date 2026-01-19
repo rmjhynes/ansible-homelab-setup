@@ -1,5 +1,5 @@
 ---
-- name: Checkout dotfiles repo
+- name: Clone dotfiles repo
   ansible.builtin.git:
     repo: "https://{{ github_username }}@github.com/{{ github_username }}/dotfiles.git"
     version: main
