@@ -149,7 +149,6 @@
     state: present
   when: not lazygit_binary.stat.exists
 
-# Ghostty installation
 - name: Check if Ghostty is installed
   ansible.builtin.stat:
     path: /usr/bin/ghostty
@@ -168,3 +167,23 @@
     name: ghostty
     state: present
   when: not ghostty_binary.stat.exists
+
+- name: Check if Terraform is installed
+  ansible.builtin.stat:
+    path: /usr/bin/terraform
+  register: terraform_binary
+
+- name: Add HashiCorp repository
+  become: true
+  ansible.builtin.get_url:
+    url: https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    dest: /etc/yum.repos.d/hashicorp.repo
+    mode: '0644'
+  when: not terraform_binary.stat.exists
+
+- name: Install Terraform
+  become: true
+  ansible.builtin.dnf:
+    name: terraform
+    state: present
+  when: not terraform_binary.stat.exists
