@@ -62,3 +62,10 @@
 - name: Display cluster info
   ansible.builtin.debug:
     var: cluster_info.stdout_lines
+
+- name: Clone homelab repo
+  ansible.builtin.git:
+    repo: "git@github.com:{{ github_username }}/homelab.git"
+    dest: "{{ ansible_facts['env']['HOME'] }}/repos/homelab"
+    version: main
+    accept_hostkey: true
