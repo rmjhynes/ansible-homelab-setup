@@ -12,6 +12,7 @@
     name:
       - ansible-core
       - bat
+      - distrobox
       - fastfetch
       - figlet
       - fzf

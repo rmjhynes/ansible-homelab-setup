@@ -187,3 +187,38 @@
     name: terraform
     state: present
   when: not terraform_binary.stat.exists
+
+- name: Check if VSCode is installed
+  ansible.builtin.stat:
+    path: /usr/bin/code
+  register: vscode_binary
+
+- name: Import Microsoft GPG key
+  become: true
+  ansible.builtin.rpm_key:
+    key: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+  when: not vscode_binary.stat.exists
+
+- name: Add VSCode repository
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/yum.repos.d/vscode.repo
+    mode: '0644'
+    content: |
+      [code]
+      name=Visual Studio Code
+      baseurl=https://packages.microsoft.com/yumrepos/vscode
+      enabled=1
+      autorefresh=1
+      type=rpm-md
+      gpgcheck=1
+      gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+  when: not vscode_binary.stat.exists
+
+- name: Install VSCode
+  become: true
+  ansible.builtin.dnf:
+    name: code
+    state: present
+  when: not vscode_binary.stat.exists
