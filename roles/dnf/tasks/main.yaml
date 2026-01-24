@@ -23,6 +23,7 @@
       - k9s
       - mullvad-vpn
       - neovim
+      - podman-docker
       - pre-commit
       - rclone
       - ripgrep
