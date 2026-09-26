@@ -19,6 +19,7 @@ See [SETUP.md](SETUP.md) for detailed prerequisites, setup instructions and trou
 - `k3d_podman` - Configures rootless podman as the container runtime for [k3d](https://k3d.io/)
 - `flatpak` - Installs Flatpak applications from Flathub
 - `vpn` - Starts [Mullvad VPN](https://mullvad.net/en) and logs in
+- `tailscale` - Enables and starts [Tailscale](https://tailscale.com/)
 
 ## Ansible Lint (via pre-commit)
 [Ansible Lint](https://docs.ansible.com/projects/lint/) is run via a [pre-commit hook](https://docs.ansible.com/projects/lint/configuring/#pre-commit-setup). The configuration for this is found in the [`.ansible-lint.yaml`](.ansible-lint.yaml) file.
