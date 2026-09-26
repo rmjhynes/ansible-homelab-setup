@@ -54,3 +54,14 @@
     name: passim
     enabled: false
     state: stopped
+
+- name: Remove blanket high-port range from default active zone
+  ansible.posix.firewalld:
+    zone: FedoraWorksation
+    port: "{{ item}}"
+    permanent: true
+    immediate: true
+    state: disabled
+  loop:
+    - 1025-65535/tcp
+    - 1025-65535/udp
