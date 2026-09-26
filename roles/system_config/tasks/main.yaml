@@ -47,3 +47,22 @@
       #!/bin/bash
       figlet -f slant Homelab
     mode: '0755'
+
+- name: Disable Passim
+  become: true
+  ansible.builtin.systemd_service:
+    name: passim
+    enabled: false
+    state: stopped
+
+- name: Remove blanket high-port range from default active zone
+  become: true
+  ansible.posix.firewalld:
+    zone: FedoraWorkstation
+    port: "{{ item}}"
+    permanent: true
+    immediate: true
+    state: disabled
+  loop:
+    - 1025-65535/tcp
+    - 1025-65535/udp

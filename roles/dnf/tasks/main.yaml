@@ -1,10 +1,17 @@
 ---
-- name: Add Mullvad repository
+- name: Add dnf repositories
   become: true
   ansible.builtin.get_url:
-    url: https://repository.mullvad.net/rpm/stable/mullvad.repo
-    dest: /etc/yum.repos.d/mullvad.repo
+    url: "{{ item.url }}"
+    dest: "/etc/yum.repos.d/{{ item.name }}.repo"
     mode: '0644'
+  loop:
+    - name: mullvad
+      url: https://repository.mullvad.net/rpm/stable/mullvad.repo
+    - name: tailscale
+      url: https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: Install Fedora dnf packages
   become: true
@@ -27,6 +34,7 @@
       - pre-commit
       - rclone
       - ripgrep
+      - tailscale
       - vim-enhanced
       - yq
       - zoxide
