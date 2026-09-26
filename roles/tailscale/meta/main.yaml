@@ -1,0 +1,4 @@
+---
+dependencies:
+# Requires tailscale package to be installed via dnf
+  - role: dnf
