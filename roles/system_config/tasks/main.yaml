@@ -43,11 +43,7 @@
   become: true
   ansible.builtin.copy:
     dest: /etc/profile.d/motd.sh
-    content: |
-      #!/bin/bash
-      figlet -f slant Homelab
-      tmux display-message -p 'There are #{server_sessions} tmux sessions running on #{host}:'
-      tmux ls
+    src: motd.sh
     mode: '0755'
 
 - name: Disable Passim
@@ -61,7 +57,7 @@
   become: true
   ansible.posix.firewalld:
     zone: FedoraWorkstation
-    port: "{{ item}}"
+    port: "{{ item }}"
     permanent: true
     immediate: true
     state: disabled
