@@ -46,6 +46,8 @@
     content: |
       #!/bin/bash
       figlet -f slant Homelab
+      tmux display-message -p 'There are #{server_sessions} tmux sessions running on #{host}:'
+      tmux ls
     mode: '0755'
 
 - name: Disable Passim
