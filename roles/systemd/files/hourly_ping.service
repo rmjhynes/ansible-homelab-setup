@@ -1,0 +1,11 @@
+[Unit]
+Description=Ping user on the hour every hour
+
+[Service]
+Type=oneshot
+User=rmjhynes
+# notify-send needs to know the user D-Bus socket so notify-send can send the
+# message to GNOME notification server.
+# This sets the env var to my own user UID.
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+ExecStart=/usr/local/bin/hourly_ping.sh
