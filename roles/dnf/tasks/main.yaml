@@ -35,6 +35,7 @@
       - rclone
       - ripgrep
       - tailscale
+      - tldr
       - vim-enhanced
       - yq
       - zoxide
