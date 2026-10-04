@@ -1,0 +1,32 @@
+---
+- name: Copy hourly ping script
+  become: true
+  ansible.builtin.copy:
+    dest: /usr/local/bin/{{ hourly_ping_name }}.sh
+    src: "{{ hourly_ping_name }}.sh"
+    mode: '0755'
+
+- name: Copy hourly ping image
+  become: true
+  ansible.builtin.copy:
+    dest: /usr/local/share/big_ben.jpg
+    src: big_ben.jpg
+    mode: '0644'
+
+- name: Copy hourly ping service and timer files
+  become: true
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/{{ hourly_ping_name }}.{{ item }}"
+    src: "{{ hourly_ping_name }}.{{ item }}"
+    mode: '0644'
+  loop:
+    - "service"
+    - "timer"
+
+- name: Enable and start the timer
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ hourly_ping_name }}.timer"
+    enabled: true
+    state: started
+    daemon_reload: true

@@ -30,3 +30,4 @@
     - flatpak
     - vpn
     - tailscale
+    - systemd
