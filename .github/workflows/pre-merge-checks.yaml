@@ -15,3 +15,12 @@ jobs:
         uses: actions/checkout@v7
       - name: Run Ansible lint
         uses: rmjhynes/github-actions/ansible-lint@main
+
+  run-shellcheck:
+    name: Run Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Run Shellcheck
+        uses: rmjhynes/github-actions/shellcheck@main
