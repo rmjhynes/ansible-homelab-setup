@@ -16,4 +16,4 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
       - name: Label pull request
-        uses: rmjhynes/github-actions/pr-labeler@add-pr-labeler-action
+        uses: rmjhynes/github-actions/pr-labeler@main
