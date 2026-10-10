@@ -1,0 +1,17 @@
+name: "Label pull request"
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+
+jobs:
+  ansible-lint:
+    name: Label oull request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Run Ansible lint
+        uses: rmjhynes/github-actions/pr-labeler@add-pr-labeler-action
