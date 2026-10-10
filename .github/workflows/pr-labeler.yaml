@@ -1,0 +1,19 @@
+name: "Label pull request"
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+
+jobs:
+  label-pull-request:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Label pull request
+        uses: rmjhynes/github-actions/pr-labeler@main
