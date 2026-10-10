@@ -23,4 +23,4 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
       - name: Run Shellcheck
-        uses: rmjhynes/github-actions/shellcheck@add-shellcheck-action
+        uses: rmjhynes/github-actions/shellcheck@main
