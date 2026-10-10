@@ -14,4 +14,4 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
       - name: Run Ansible lint
-        uses: rmjhynes/github-actions/ansible-lint@add-ansible-lint-action
+        uses: rmjhynes/github-actions/ansible-lint@main
