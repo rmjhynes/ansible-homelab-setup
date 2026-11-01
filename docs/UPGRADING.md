@@ -33,4 +33,4 @@ sudo umount /mnt
 ```
 ## 3. Upgrade Fedora system version
 
-The recommended way to download and upgrade Fedora Workstation is in the GNOME UI [as per the docs](https://docs.fedoraproject.org/en-US/quick-docs/upgrading-fedora-new-release/#_upgrading_to_the_next_fedora_workstation_release).
+The recommended way to download the new version and upgrade Fedora Workstation is via the GNOME UI [as per the docs](https://docs.fedoraproject.org/en-US/quick-docs/upgrading-fedora-new-release/#_upgrading_to_the_next_fedora_workstation_release).
