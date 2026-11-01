@@ -12,7 +12,9 @@ reboot
 
 ## 2. Take snapshot of the root filesystem
 
-Import [the diagram](./btrfs-snapshot.excalidraw) into excalidraw for a visual representation of this process.
+
+> [!TIP]
+> Import [the diagram](./btrfs-snapshot.excalidraw) into excalidraw for a visual representation of this process.
 
 ```sh
 # Mount the btrfs top level (subvolid=5) at /mnt
