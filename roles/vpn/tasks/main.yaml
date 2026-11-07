@@ -14,7 +14,9 @@
   register: mullvad_account_info
   changed_when: false
   failed_when: mullvad_account_info.rc != 0
+  no_log: true
 
-- name: Print Mullvad account info
+# Only print lines that are safe to show, never the "Mullvad account" line
+- name: Print Mullvad account expiry and device name
   ansible.builtin.debug:
-    var: mullvad_account_info.stdout_lines
+    msg: "{{ mullvad_account_info.stdout_lines | select('search', '^(Expires at|Device name):') | list }}"
