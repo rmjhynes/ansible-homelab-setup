@@ -2,12 +2,12 @@
 - name: Download K3s install script
   ansible.builtin.get_url:
     url: https://get.k3s.io
-    dest: /tmp/k3s-install.sh
+    dest: "{{ tmp_install_dir.path }}/k3s-install.sh"
     mode: '0755'
 
 - name: Run K3s install script
   become: true
-  ansible.builtin.command: sh /tmp/k3s-install.sh
+  ansible.builtin.command: "sh {{ tmp_install_dir.path }}/k3s-install.sh"
   args:
     creates: /usr/local/bin/k3s
 
@@ -68,4 +68,3 @@
     repo: "git@github.com:{{ github_username }}/homelab.git"
     dest: "{{ ansible_facts['env']['HOME'] }}/repos/homelab"
     version: main
-    accept_hostkey: true
