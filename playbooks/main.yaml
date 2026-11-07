@@ -19,6 +19,13 @@
 
             ANSIBLE_MULLVAD_ACCOUNT_NUMBER=<your_account_number> ansible-playbook playbooks/main.yaml
         success_msg: "ANSIBLE_MULLVAD_ACCOUNT_NUMBER environment variable is set - proceeding..."
+
+    # Installers use this instead of fixed /tmp paths that other local users could plant malicious files at
+    - name: Create private temp directory for installers
+      ansible.builtin.tempfile:
+        state: directory
+      register: tmp_install_dir
+      changed_when: false
   roles:
     - dnf
     - external_packages
@@ -31,3 +38,9 @@
     - vpn
     - tailscale
     - systemd
+  post_tasks:
+    - name: Remove private temp directory
+      ansible.builtin.file:
+        path: "{{ tmp_install_dir.path }}"
+        state: absent
+      changed_when: false
