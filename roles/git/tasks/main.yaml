@@ -55,6 +55,21 @@
     group: "{{ ansible_facts['user_id'] }}"
     mode: '0600'
 
+- name: Get GitHub SSH host keys
+  ansible.builtin.uri:
+    url: https://api.github.com/meta
+    return_content: true
+  register: github_meta
+
+- name: Pin GitHub SSH host keys to homelab machine to verify remote GitHub servers
+  ansible.builtin.known_hosts:
+    name: github.com
+    key: "github.com {{ item }}"
+    state: present
+  loop: "{{ github_meta.json.ssh_keys }}"
+  loop_control:
+    label: "{{ item.split()[0] }}"
+
 - name: Retrieve public key content
   ansible.builtin.command: "cat {{ ssh_key_path }}.pub"
   register: pubkey_content

@@ -68,4 +68,3 @@
     repo: "git@github.com:{{ github_username }}/homelab.git"
     dest: "{{ ansible_facts['env']['HOME'] }}/repos/homelab"
     version: main
-    accept_hostkey: true
