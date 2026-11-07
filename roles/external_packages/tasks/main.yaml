@@ -40,17 +40,42 @@
     remote_src: true
   when: not argocd_binary.stat.exists
 
-- name: Download K3d install script
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh
-    dest: "{{ tmp_install_dir.path }}/k3d-install.sh"
-    mode: '0755'
+- name: Get installed K3d version
+  ansible.builtin.command: /usr/local/bin/k3d version
+  register: k3d_version_output
+  changed_when: false
+  failed_when: false
 
-- name: Install K3d
+# True if K3d is missing or is not the version set in k3d_version
+- name: Check if K3d needs installing
+  ansible.builtin.set_fact:
+    k3d_install_needed: "{{ ('k3d version v' ~ k3d_version) not in (k3d_version_output.stdout_lines | default([])) }}"
+
+- name: Get K3d release checksums
+  ansible.builtin.uri:
+    url: "https://github.com/k3d-io/k3d/releases/download/v{{ k3d_version }}/checksums.txt"
+    return_content: true
+  register: k3d_checksums
+  when: k3d_install_needed
+
+# The file lists this binary as _dist/k3d-linux-amd64
+- name: Download K3d binary
+  ansible.builtin.get_url:
+    url: "https://github.com/k3d-io/k3d/releases/download/v{{ k3d_version }}/k3d-linux-amd64"
+    dest: "{{ tmp_install_dir.path }}/k3d"
+    checksum: "sha256:{{ (k3d_checksums.content.splitlines() | select('search', '[ /]k3d-linux-amd64$') | first).split()[0] }}"
+    mode: '0755'
+    timeout: 180
+  when: k3d_install_needed
+
+- name: Install K3d binary
   become: true
-  ansible.builtin.command:
-    cmd: "{{ tmp_install_dir.path }}/k3d-install.sh"
-    creates: /usr/local/bin/k3d
+  ansible.builtin.copy:
+    src: "{{ tmp_install_dir.path }}/k3d"
+    dest: /usr/local/bin/k3d
+    mode: '0755'
+    remote_src: true
+  when: k3d_install_needed
 
 - name: Check if Kubeseal is installed
   ansible.builtin.stat:

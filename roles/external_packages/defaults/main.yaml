@@ -1,2 +1,4 @@
 ---
 kubeseal_version: "0.34.0"
+
+k3d_version: "5.9.0"
